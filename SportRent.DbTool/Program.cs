@@ -1,109 +1,278 @@
-﻿using Microsoft.Data.Sqlite;
+using System.Text.RegularExpressions;
+using Microsoft.Data.Sqlite;
 
-internal class Program
+internal static class Program
 {
-    private static readonly string[] ScriptFiles =
-    {
-        "001_recreate.sql",
-        "002_schema.sql",
-        "003_seed.sql"
-    };
+    private static readonly Regex ScriptFilePattern = new(
+        @"^\d{3}_.+\.sql$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-    private static void Main(string[] args)
+    private static int Main(string[] args)
     {
         try
         {
-            string root = FindProjectRoot();
-
-            string databaseDir = Path.Combine(root, "database");
-            string artifactsDir = Path.Combine(root, "artifacts");
-            string dbPath = Path.Combine(artifactsDir, "sportRent.db");
+            BuildOptions options = ParseArguments(args);
+            string root = ResolveRoot(options.Root);
+            string scriptsDirectory = ResolvePath(root, options.ScriptsDirectory ?? "database");
+            string outputPath = ResolvePath(root, options.OutputPath ?? Path.Combine("artifacts", "sportRent.db"));
+            string[] scripts = GetScriptFiles(scriptsDirectory);
 
             Console.WriteLine($"[INFO] Root: {root}");
-            Console.WriteLine($"[INFO] Database dir: {databaseDir}");
-            Console.WriteLine($"[INFO] Artifacts dir: {artifactsDir}");
-            Console.WriteLine($"[INFO] DB file: {dbPath}");
+            Console.WriteLine($"[INFO] Scripts dir: {scriptsDirectory}");
+            Console.WriteLine($"[INFO] DB file: {outputPath}");
+            Console.WriteLine($"[INFO] Scripts found: {scripts.Length}");
 
-            _ = Directory.CreateDirectory(artifactsDir);
-
-            if (File.Exists(dbPath))
-            {
-                Console.WriteLine("[INFO] Deleting old database...");
-                File.Delete(dbPath);
-            }
-
-            CreateDatabase(dbPath);
-            ExecuteScripts(dbPath, databaseDir);
+            BuildDatabase(outputPath, scripts);
 
             Console.WriteLine("[SUCCESS] Database created.");
+            return 0;
         }
         catch (Exception ex)
         {
-            Console.WriteLine("[ERROR] Failed to build database.");
-            Console.WriteLine(ex);
+            Console.Error.WriteLine("[ERROR] Failed to build database.");
+            Console.Error.WriteLine(ex);
+            return 1;
         }
     }
 
-    private static void CreateDatabase(string dbPath)
+    private static BuildOptions ParseArguments(string[] args)
     {
-        string cs = new SqliteConnectionStringBuilder
+        string? root = null;
+        string? scriptsDirectory = null;
+        string? outputPath = null;
+
+        for (int i = 0; i < args.Length; i++)
         {
-            DataSource = dbPath,
-            ForeignKeys = true
-        }.ToString();
+            string arg = args[i];
 
-        using var connection = new SqliteConnection(cs);
-        connection.Open();
+            if (arg is "--help" or "-h")
+            {
+                PrintUsage();
+                Environment.Exit(0);
+            }
 
-        Console.WriteLine("[INFO] SQLite file created.");
+            string value = ReadValue(args, ref i);
+
+            switch (arg)
+            {
+                case "--root":
+                    root = value;
+                    break;
+                case "--scripts-dir":
+                    scriptsDirectory = value;
+                    break;
+                case "--output":
+                    outputPath = value;
+                    break;
+                default:
+                    throw new ArgumentException($"Unknown argument: {arg}");
+            }
+        }
+
+        return new BuildOptions(root, scriptsDirectory, outputPath);
     }
 
-    private static void ExecuteScripts(string dbPath, string databaseDir)
+    private static string ReadValue(string[] args, ref int index)
     {
-        string cs = new SqliteConnectionStringBuilder
+        if (index + 1 >= args.Length)
+        {
+            throw new ArgumentException($"Expected a value after {args[index]}");
+        }
+
+        index++;
+        return args[index];
+    }
+
+    private static string ResolveRoot(string? rootArgument)
+    {
+        if (!string.IsNullOrWhiteSpace(rootArgument))
+        {
+            string root = Path.GetFullPath(rootArgument);
+
+            if (!Directory.Exists(root))
+            {
+                throw new DirectoryNotFoundException($"Root directory not found: {root}");
+            }
+
+            return root;
+        }
+
+        return FindProjectRoot();
+    }
+
+    private static string ResolvePath(string root, string path)
+    {
+        return Path.GetFullPath(Path.IsPathRooted(path) ? path : Path.Combine(root, path));
+    }
+
+    private static string[] GetScriptFiles(string scriptsDirectory)
+    {
+        if (!Directory.Exists(scriptsDirectory))
+        {
+            throw new DirectoryNotFoundException($"Scripts directory not found: {scriptsDirectory}");
+        }
+
+        string[] scripts = Directory
+            .EnumerateFiles(scriptsDirectory, "*.sql", SearchOption.TopDirectoryOnly)
+            .Where(path => ScriptFilePattern.IsMatch(Path.GetFileName(path)))
+            .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        if (scripts.Length == 0)
+        {
+            throw new InvalidOperationException(
+                $"No numbered SQL scripts matching 000_name.sql were found in {scriptsDirectory}");
+        }
+
+        return scripts;
+    }
+
+    private static void BuildDatabase(string outputPath, IReadOnlyList<string> scripts)
+    {
+        string artifactsDirectory = Path.GetDirectoryName(outputPath)
+            ?? throw new InvalidOperationException($"Cannot determine output directory for {outputPath}");
+
+        Directory.CreateDirectory(artifactsDirectory);
+
+        string tempPath = Path.Combine(
+            artifactsDirectory,
+            $"{Path.GetFileNameWithoutExtension(outputPath)}.{Guid.NewGuid():N}{Path.GetExtension(outputPath)}");
+
+        try
+        {
+            using (SqliteConnection connection = OpenConnection(tempPath))
+            {
+                using SqliteTransaction transaction = connection.BeginTransaction();
+
+                foreach (string scriptPath in scripts)
+                {
+                    ExecuteScript(connection, transaction, scriptPath);
+                }
+
+                transaction.Commit();
+            }
+
+            ReplaceDatabase(tempPath, outputPath);
+        }
+        catch
+        {
+            TryDeleteFile(tempPath);
+            throw;
+        }
+    }
+
+    private static SqliteConnection OpenConnection(string dbPath)
+    {
+        string connectionString = new SqliteConnectionStringBuilder
         {
             DataSource = dbPath,
-            ForeignKeys = true
+            ForeignKeys = true,
+            Pooling = false
         }.ToString();
 
-        using var connection = new SqliteConnection(cs);
+        var connection = new SqliteConnection(connectionString);
         connection.Open();
 
-        foreach (string script in ScriptFiles)
+        return connection;
+    }
+
+    private static void ExecuteScript(
+        SqliteConnection connection,
+        SqliteTransaction transaction,
+        string scriptPath)
+    {
+        if (!File.Exists(scriptPath))
         {
-            string path = Path.Combine(databaseDir, script);
-
-            Console.WriteLine($"[INFO] Running {script}");
-
-            string sql = File.ReadAllText(path);
-
-            using SqliteCommand cmd = connection.CreateCommand();
-            cmd.CommandText = sql;
-            _ = cmd.ExecuteNonQuery();
+            throw new FileNotFoundException("SQL script not found.", scriptPath);
         }
+
+        string sql = File.ReadAllText(scriptPath);
+
+        if (string.IsNullOrWhiteSpace(sql))
+        {
+            throw new InvalidOperationException($"SQL script is empty: {scriptPath}");
+        }
+
+        Console.WriteLine($"[INFO] Running {Path.GetFileName(scriptPath)}");
+
+        using SqliteCommand command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = sql;
+        _ = command.ExecuteNonQuery();
+    }
+
+    private static void ReplaceDatabase(string tempPath, string outputPath)
+    {
+        if (File.Exists(outputPath))
+        {
+            Console.WriteLine("[INFO] Replacing existing database...");
+            RetryOnIOException(() => File.Delete(outputPath), $"Unable to delete existing database: {outputPath}");
+        }
+
+        RetryOnIOException(() => File.Move(tempPath, outputPath), $"Unable to place database at: {outputPath}");
+    }
+
+    private static void TryDeleteFile(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private static void RetryOnIOException(Action action, string failureMessage)
+    {
+        const int maxAttempts = 10;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                action();
+                return;
+            }
+            catch (IOException) when (attempt < maxAttempts)
+            {
+                Thread.Sleep(200);
+            }
+        }
+
+        throw new IOException(failureMessage);
     }
 
     private static string FindProjectRoot()
     {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-
-        Console.WriteLine($"[DEBUG] Start search from: {dir.FullName}");
-
-        while (dir != null)
+        foreach (string startPath in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
         {
-            string databasePath = Path.Combine(dir.FullName, "database");
+            var directory = new DirectoryInfo(startPath);
 
-            Console.WriteLine($"[DEBUG] Checking: {databasePath}");
-
-            if (Directory.Exists(databasePath))
+            while (directory != null)
             {
-                Console.WriteLine("[DEBUG] Found database folder!");
-                return dir.FullName;
-            }
+                if (Directory.Exists(Path.Combine(directory.FullName, "database")))
+                {
+                    return directory.FullName;
+                }
 
-            dir = dir.Parent;
+                directory = directory.Parent;
+            }
         }
 
-        throw new DirectoryNotFoundException("database folder not found");
+        throw new DirectoryNotFoundException("Project root with database folder not found.");
     }
+
+    private static void PrintUsage()
+    {
+        Console.WriteLine("SportRent.DbTool usage:");
+        Console.WriteLine("  --root <path>         Optional project root.");
+        Console.WriteLine("  --scripts-dir <path>  Optional SQL scripts directory. Default: database");
+        Console.WriteLine("  --output <path>       Optional output DB path. Default: artifacts/sportRent.db");
+    }
+
+    private sealed record BuildOptions(string? Root, string? ScriptsDirectory, string? OutputPath);
 }

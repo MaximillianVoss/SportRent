@@ -66,7 +66,7 @@ Ensure-Package "SportRent.Data" "Microsoft.EntityFrameworkCore.Design" $EfVersio
 
 Write-Host ""
 Write-Host "[STEP] Rebuilding SQLite database..."
-dotnet run --project SportRent.DbTool
+dotnet run --project SportRent.DbTool -- --root $solutionRoot --scripts-dir database --output artifacts\sportRent.db
 
 if ($LASTEXITCODE -ne 0) {
     Fail "Database build failed."
