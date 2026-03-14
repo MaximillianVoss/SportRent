@@ -11,11 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportRent.DbTool", "SportRe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\OneDrive\Рабочий стол\Временное хранилище\БД.Схема.Аренда инвенторя.xml = ..\..\..\OneDrive\Рабочий стол\Временное хранилище\БД.Схема.Аренда инвенторя.xml
-		..\..\..\OneDrive\Рабочий стол\Временное хранилище\скрипт инициализации БД.sql = ..\..\..\OneDrive\Рабочий стол\Временное хранилище\скрипт инициализации БД.sql
+		database\001_recreate.sql = database\001_recreate.sql
+		database\002_schema.sql = database\002_schema.sql
+		database\003_seed.sql = database\003_seed.sql
+		database\БД.Схема.Аренда инвенторя.xml = database\БД.Схема.Аренда инвенторя.xml
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "artifacts", "artifacts", "{F55FE59C-B863-41E1-AC51-F3460FE7AED6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
