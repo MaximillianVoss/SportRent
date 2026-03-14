@@ -14,7 +14,9 @@ internal static class Program
             BuildOptions options = ParseArguments(args);
             string root = ResolveRoot(options.Root);
             string scriptsDirectory = ResolvePath(root, options.ScriptsDirectory ?? "database");
-            string outputPath = ResolvePath(root, options.OutputPath ?? Path.Combine("artifacts", "sportRent.db"));
+            string outputPath = ResolvePath(
+                root,
+                options.OutputPath ?? Path.Combine("SportRent.Mobile", "Resources", "Raw", "Database", "sportRent.db"));
             string[] scripts = GetScriptFiles(scriptsDirectory);
 
             Console.WriteLine($"[INFO] Root: {root}");
@@ -271,7 +273,7 @@ internal static class Program
         Console.WriteLine("SportRent.DbTool usage:");
         Console.WriteLine("  --root <path>         Optional project root.");
         Console.WriteLine("  --scripts-dir <path>  Optional SQL scripts directory. Default: database");
-        Console.WriteLine("  --output <path>       Optional output DB path. Default: artifacts/sportRent.db");
+        Console.WriteLine("  --output <path>       Optional output DB path. Default: SportRent.Mobile/Resources/Raw/Database/sportRent.db");
     }
 
     private sealed record BuildOptions(string? Root, string? ScriptsDirectory, string? OutputPath);

@@ -5,12 +5,14 @@ Write-Host "============================="
 Write-Host ""
 
 $EfVersion = "9.0.4"
+$DbRelativePath = "SportRent.Mobile\Resources\Raw\Database\sportRent.db"
 
 $solutionRoot = Resolve-Path ".."
 Set-Location $solutionRoot
 
 Write-Host "[INFO] Solution root: $solutionRoot"
 Write-Host "[INFO] EF Core version: $EfVersion"
+Write-Host "[INFO] SQLite DB path: $DbRelativePath"
 
 function Fail($message)
 {
@@ -66,7 +68,7 @@ Ensure-Package "SportRent.Data" "Microsoft.EntityFrameworkCore.Design" $EfVersio
 
 Write-Host ""
 Write-Host "[STEP] Rebuilding SQLite database..."
-dotnet run --project SportRent.DbTool -- --root $solutionRoot --scripts-dir database --output artifacts\sportRent.db
+dotnet run --project SportRent.DbTool -- --root $solutionRoot --scripts-dir database --output $DbRelativePath
 
 if ($LASTEXITCODE -ne 0) {
     Fail "Database build failed."
@@ -81,7 +83,7 @@ Write-Host ""
 Write-Host "[STEP] Running EF Core scaffolding..."
 
 dotnet ef dbcontext scaffold `
-"Data Source=artifacts\sportRent.db" `
+"Data Source=$DbRelativePath" `
 Microsoft.EntityFrameworkCore.Sqlite `
 --project SportRent.Data `
 --startup-project SportRent.Data `
