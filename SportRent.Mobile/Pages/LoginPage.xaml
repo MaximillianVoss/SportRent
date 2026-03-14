@@ -28,7 +28,7 @@
                                FontSize="14"
                                FontAttributes="Bold"
                                TextColor="#B9D6C8" />
-                        <Label Text="Мобильная аренда спортивного инвентаря"
+                        <Label Text="Аренда спортивного инвентаря"
                                FontSize="28"
                                FontAttributes="Bold"
                                TextColor="White"

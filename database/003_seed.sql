@@ -134,11 +134,11 @@ INSERT INTO rentalPointEquipment (
 (1, 5, 1, 1, 10, 9);
 
 INSERT INTO images (url) VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Mountainbike.jpg'),
-('https://commons.wikimedia.org/wiki/Special:FilePath/SkiCollection.jpg'),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Snowboarding.jpg'),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Electric%20Scooter.jpg'),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Bicycle%20Helmet.JPG');
+('equipment_bike.jpg'),
+('equipment_skis.jpg'),
+('equipment_snowboard.jpg'),
+('equipment_scooter.jpg'),
+('equipment_helmet.jpg');
 
 INSERT INTO equipmentPhotos (idEquipment, idImage) VALUES
 (1, 1),
