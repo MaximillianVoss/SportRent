@@ -1,24 +1,48 @@
-﻿namespace SportRent.Mobile
+using Microsoft.Extensions.DependencyInjection;
+using SportRent.Mobile.Models;
+using SportRent.Mobile.ViewModels;
+
+namespace SportRent.Mobile
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
+        private bool _hasInitialized;
 
         public MainPage()
         {
             InitializeComponent();
+            BindingContext = MauiProgram.Services.GetRequiredService<MainPageViewModel>();
         }
 
-        private void OnCounterClicked(object? sender, EventArgs e)
+        private MainPageViewModel ViewModel => (MainPageViewModel)BindingContext;
+
+        protected override async void OnAppearing()
         {
-            count++;
+            base.OnAppearing();
 
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
+            if (_hasInitialized)
+            {
+                return;
+            }
 
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            _hasInitialized = true;
+            await ViewModel.InitializeAsync();
+        }
+
+        private async void OnEquipmentTapped(object? sender, TappedEventArgs e)
+        {
+            if ((sender as BindableObject)?.BindingContext is CatalogEquipmentItem item)
+            {
+                await ViewModel.OpenEquipmentAsync(item);
+            }
+        }
+
+        private void OnCategoryChipClicked(object? sender, EventArgs e)
+        {
+            if ((sender as BindableObject)?.BindingContext is CategoryChipViewModel chip)
+            {
+                ViewModel.SelectCategory(chip);
+            }
         }
     }
 }

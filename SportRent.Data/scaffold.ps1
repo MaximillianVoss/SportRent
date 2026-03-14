@@ -7,12 +7,14 @@ Write-Host ""
 $EfVersion = "9.0.4"
 $DbRelativePath = "SportRent.Mobile\Resources\Raw\Database\sportRent.db"
 
-$solutionRoot = Resolve-Path ".."
+$solutionRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
+$DbAbsolutePath = Join-Path $solutionRoot $DbRelativePath
 Set-Location $solutionRoot
 
 Write-Host "[INFO] Solution root: $solutionRoot"
 Write-Host "[INFO] EF Core version: $EfVersion"
 Write-Host "[INFO] SQLite DB path: $DbRelativePath"
+Write-Host "[INFO] SQLite DB absolute path: $DbAbsolutePath"
 
 function Fail($message)
 {
@@ -83,7 +85,7 @@ Write-Host ""
 Write-Host "[STEP] Running EF Core scaffolding..."
 
 dotnet ef dbcontext scaffold `
-"Data Source=$DbRelativePath" `
+"Data Source=$DbAbsolutePath" `
 Microsoft.EntityFrameworkCore.Sqlite `
 --project SportRent.Data `
 --startup-project SportRent.Data `
@@ -91,7 +93,7 @@ Microsoft.EntityFrameworkCore.Sqlite `
 --output-dir Entities `
 --context-dir Context `
 --force `
---use-database-names
+--no-onconfiguring
 
 if ($LASTEXITCODE -ne 0) {
     Fail "Scaffolding failed."

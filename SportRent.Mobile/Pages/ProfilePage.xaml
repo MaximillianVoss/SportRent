@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:SportRent.Mobile.ViewModels"
+             x:Class="SportRent.Mobile.Pages.ProfilePage"
+             x:DataType="viewModels:ProfilePageViewModel"
+             Title="Профиль"
+             BackgroundColor="#F3EEE4">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F8F4EC" Offset="0" />
+            <GradientStop Color="#EBF2EC" Offset="0.5" />
+            <GradientStop Color="#EEE5D7" Offset="1" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <Grid>
+        <RefreshView IsRefreshing="{Binding IsBusy}"
+                     Refreshing="OnRefreshRequested">
+            <ScrollView>
+                <VerticalStackLayout Padding="20,18,20,28"
+                                     Spacing="18">
+                    <Border BackgroundColor="#163B2D"
+                            Padding="20"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 28">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{Binding DisplayName}"
+                                   FontSize="28"
+                                   FontAttributes="Bold"
+                                   TextColor="White" />
+                            <Label Text="{Binding RoleTitle}"
+                                   FontSize="14"
+                                   TextColor="#DCEDE2" />
+                            <Label Text="{Binding MemberSinceText}"
+                                   FontSize="13"
+                                   TextColor="#CFE2D7" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border IsVisible="{Binding HasError}"
+                            BackgroundColor="#FFF1F0"
+                            Padding="14"
+                            Stroke="#E9A7A4"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 18">
+                        <Label Text="{Binding ErrorMessage}"
+                               TextColor="#8C2F39"
+                               LineBreakMode="WordWrap" />
+                    </Border>
+
+                    <Border BackgroundColor="#FCFAF6"
+                            Padding="16"
+                            Stroke="#D7D1C0"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 22">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Контакты"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#24322D" />
+                            <Label Text="{Binding Email}"
+                                   FontSize="14"
+                                   TextColor="#4C5752" />
+                            <Label Text="{Binding Phone}"
+                                   FontSize="14"
+                                   TextColor="#4C5752" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto"
+                          ColumnSpacing="12"
+                          RowSpacing="12">
+                        <Border Grid.Column="0"
+                                BackgroundColor="#FCFAF6"
+                                Padding="16"
+                                Stroke="#D7D1C0"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 22">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding TotalOrders}"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       TextColor="#1F2926" />
+                                <Label Text="Всего заказов"
+                                       FontSize="12"
+                                       TextColor="#68726B" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                BackgroundColor="#FCFAF6"
+                                Padding="16"
+                                Stroke="#D7D1C0"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 22">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding ActiveOrders}"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       TextColor="#1F2926" />
+                                <Label Text="Активные"
+                                       FontSize="12"
+                                       TextColor="#68726B" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Grid.Column="0"
+                                BackgroundColor="#FCFAF6"
+                                Padding="16"
+                                Stroke="#D7D1C0"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 22">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding CompletedOrders}"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       TextColor="#1F2926" />
+                                <Label Text="Завершенные"
+                                       FontSize="12"
+                                       TextColor="#68726B" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Grid.Row="1"
+                                Grid.Column="1"
+                                BackgroundColor="#FCFAF6"
+                                Padding="16"
+                                Stroke="#D7D1C0"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 22">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding OutstandingText}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="#1F2926" />
+                                <Label Text="Ожидает оплаты"
+                                       FontSize="12"
+                                       TextColor="#68726B" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </Grid>
+
+                    <Border BackgroundColor="#FCFAF6"
+                            Padding="16"
+                            Stroke="#D7D1C0"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 22">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Оплачено через приложение"
+                                   FontSize="13"
+                                   TextColor="#68726B" />
+                            <Label Text="{Binding TotalPaidText}"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="#163B2D" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Button Text="Выйти из аккаунта"
+                            Clicked="OnSignOutClicked"
+                            BackgroundColor="#8C2F39"
+                            TextColor="White"
+                            CornerRadius="20"
+                            Padding="16,14" />
+                </VerticalStackLayout>
+            </ScrollView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

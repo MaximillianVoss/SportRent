@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:SportRent.Mobile.ViewModels"
+             x:Class="SportRent.Mobile.Pages.CreateOrderPage"
+             x:DataType="viewModels:CreateOrderPageViewModel"
+             Title="Оформление заказа"
+             BackgroundColor="#F3EEE4">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F8F4EC" Offset="0" />
+            <GradientStop Color="#EBF2EC" Offset="0.5" />
+            <GradientStop Color="#EEE5D7" Offset="1" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="20,20,20,28"
+                                 Spacing="18">
+                <Border BackgroundColor="{Binding AccentColor}"
+                        Padding="20"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 28">
+                    <Grid ColumnDefinitions="92,*"
+                          ColumnSpacing="16">
+                        <Border BackgroundColor="{Binding AccentSurfaceColor}"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 22"
+                                HeightRequest="92"
+                                WidthRequest="92">
+                            <Grid>
+                                <Image Source="{Binding ImageUrl}"
+                                       Aspect="AspectFill" />
+                                <Label Text="{Binding SymbolText}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding AccentColor}" />
+                            </Grid>
+                        </Border>
+
+                        <VerticalStackLayout Grid.Column="1"
+                                             Spacing="6">
+                            <Label Text="{Binding CategoryTitle}"
+                                   FontSize="13"
+                                   TextColor="#DCEDE2" />
+                            <Label Text="{Binding Title}"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   LineBreakMode="WordWrap" />
+                            <Label Text="{Binding BrandModelText}"
+                                   FontSize="14"
+                                   TextColor="#F0F6F2" />
+                            <Label Text="{Binding DescriptionText}"
+                                   FontSize="13"
+                                   TextColor="#DCE8E1"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="3" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <Border IsVisible="{Binding HasError}"
+                        BackgroundColor="#FFF1F0"
+                        Padding="14"
+                        Stroke="#E9A7A4"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 18">
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#8C2F39"
+                           LineBreakMode="WordWrap" />
+                </Border>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Тариф аренды"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#21342D" />
+                    <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Rates}"
+                                           Spacing="10">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="viewModels:RentalRateOptionViewModel">
+                                <Border BackgroundColor="{Binding BackgroundColor}"
+                                        Padding="14"
+                                        Stroke="{Binding BorderColor}"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 20">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnRateTapped" />
+                                    </Border.GestureRecognizers>
+
+                                    <VerticalStackLayout Spacing="4"
+                                                         WidthRequest="150">
+                                        <Label Text="{Binding Title}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               TextColor="{Binding PrimaryTextColor}" />
+                                        <Label Text="{Binding MetaText}"
+                                               FontSize="13"
+                                               TextColor="{Binding SecondaryTextColor}" />
+                                        <Label Text="{Binding DepositText}"
+                                               FontSize="12"
+                                               TextColor="{Binding SecondaryTextColor}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Пункт выдачи"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#21342D" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding RentalPoints}"
+                                         Spacing="10">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="viewModels:RentalPointOptionViewModel">
+                                <Border BackgroundColor="{Binding BackgroundColor}"
+                                        Padding="16"
+                                        Stroke="{Binding BorderColor}"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 22">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnRentalPointTapped" />
+                                    </Border.GestureRecognizers>
+
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          ColumnSpacing="10">
+                                        <VerticalStackLayout Spacing="6">
+                                            <Label Text="{Binding Title}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#25322E" />
+                                            <Label Text="{Binding Address}"
+                                                   FontSize="13"
+                                                   TextColor="#59655F"
+                                                   LineBreakMode="WordWrap" />
+                                            <Label Text="{Binding MetaText}"
+                                                   FontSize="13"
+                                                   TextColor="#66716C" />
+                                            <Label Text="{Binding PhoneText}"
+                                                   FontSize="13"
+                                                   TextColor="#45514B" />
+                                        </VerticalStackLayout>
+
+                                        <Border Grid.Column="1"
+                                                BackgroundColor="#F1EBDF"
+                                                Padding="10,6"
+                                                StrokeThickness="0"
+                                                StrokeShape="RoundRectangle 16"
+                                                VerticalOptions="Start">
+                                            <Label Text="{Binding AvailabilityText}"
+                                                   FontSize="12"
+                                                   TextColor="#534D45" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+
+                <Border BackgroundColor="#FCFAF6"
+                        Padding="16"
+                        Stroke="#D7D1C0"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 22">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Параметры аренды"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#24322D" />
+
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="12">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Дата начала"
+                                       FontSize="13"
+                                       TextColor="#57615B" />
+                                <DatePicker Date="{Binding StartDate}" />
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="6">
+                                <Label Text="Время начала"
+                                       FontSize="13"
+                                       TextColor="#57615B" />
+                                <TimePicker Time="{Binding StartTime}" />
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="12">
+                            <Border BackgroundColor="#F4EFE4"
+                                    Padding="14"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 18">
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="Количество единиц"
+                                           FontSize="13"
+                                           TextColor="#57615B" />
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="10">
+                                        <Button Text="-"
+                                                Clicked="OnDecreaseQuantityClicked"
+                                                BackgroundColor="#163B2D"
+                                                TextColor="White"
+                                                CornerRadius="16"
+                                                WidthRequest="40" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding QuantityText}"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center"
+                                               VerticalTextAlignment="Center"
+                                               TextColor="#22312C" />
+                                        <Button Grid.Column="2"
+                                                Text="+"
+                                                Clicked="OnIncreaseQuantityClicked"
+                                                BackgroundColor="#163B2D"
+                                                TextColor="White"
+                                                CornerRadius="16"
+                                                WidthRequest="40" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="1"
+                                    BackgroundColor="#F4EFE4"
+                                    Padding="14"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 18">
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="Количество периодов"
+                                           FontSize="13"
+                                           TextColor="#57615B" />
+                                    <Grid ColumnDefinitions="Auto,*,Auto"
+                                          ColumnSpacing="10">
+                                        <Button Text="-"
+                                                Clicked="OnDecreasePeriodClicked"
+                                                BackgroundColor="#163B2D"
+                                                TextColor="White"
+                                                CornerRadius="16"
+                                                WidthRequest="40" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding PeriodCountText}"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               HorizontalTextAlignment="Center"
+                                               VerticalTextAlignment="Center"
+                                               TextColor="#22312C" />
+                                        <Button Grid.Column="2"
+                                                Text="+"
+                                                Clicked="OnIncreasePeriodClicked"
+                                                BackgroundColor="#163B2D"
+                                                TextColor="White"
+                                                CornerRadius="16"
+                                                WidthRequest="40" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="#FCFAF6"
+                        Padding="16"
+                        Stroke="#D7D1C0"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 22">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Сводка"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#24322D" />
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+                            <Label Text="Окончание аренды"
+                                   FontSize="14"
+                                   TextColor="#57615B" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding EndDateText}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#1E2E28" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+                            <Label Text="Стоимость аренды"
+                                   FontSize="14"
+                                   TextColor="#57615B" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding RentalAmountText}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#163B2D" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+                            <Label Text="Залог"
+                                   FontSize="14"
+                                   TextColor="#57615B" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding DepositText}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#3F403E" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="10">
+                            <Label Text="Платеж"
+                                   FontSize="14"
+                                   TextColor="#57615B" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding TotalPaymentText}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="#163B2D" />
+                        </Grid>
+                        <Label Text="Платеж будет создан со статусом «Ожидает оплаты», чтобы его было видно в истории заказов."
+                               FontSize="12"
+                               TextColor="#67726C"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="Подтвердить аренду"
+                        Clicked="OnSubmitClicked"
+                        BackgroundColor="#163B2D"
+                        TextColor="White"
+                        CornerRadius="20"
+                        Padding="18,14" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding IsBusy}"
+              BackgroundColor="#66F3EEE4">
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               Color="#163B2D"
+                               HeightRequest="48"
+                               WidthRequest="48"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

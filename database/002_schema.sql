@@ -92,12 +92,14 @@ CREATE TABLE users (
     idRole INTEGER NOT NULL,
     firstName TEXT NOT NULL,
     lastName TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
     phone TEXT NOT NULL UNIQUE,
     passwordHash TEXT NOT NULL,
     dateCreated TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (idRole) REFERENCES roles(id) ON DELETE RESTRICT,
     CHECK (LENGTH(TRIM(firstName)) > 0),
     CHECK (LENGTH(TRIM(lastName)) > 0),
+    CHECK (LENGTH(TRIM(email)) > 0),
     CHECK (LENGTH(TRIM(phone)) > 0),
     CHECK (LENGTH(TRIM(passwordHash)) > 0)
 );

@@ -1,15 +1,49 @@
-﻿namespace SportRent.Mobile
+using SportRent.Mobile.Pages;
+using SportRent.Mobile.Services;
+
+namespace SportRent.Mobile;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    private readonly IUserSessionService _userSessionService;
+    private Window? _window;
+
+    public App(IUserSessionService userSessionService)
     {
-        public App()
+        InitializeComponent();
+        _userSessionService = userSessionService;
+        _userSessionService.SessionChanged += OnSessionChanged;
+    }
+
+    protected override Window CreateWindow(IActivationState? activationState)
+    {
+        _window = new Window(CreateRootPage());
+        return _window;
+    }
+
+    private Page CreateRootPage()
+    {
+        if (_userSessionService.IsAuthenticated)
         {
-            InitializeComponent();
+            return new AppShell();
         }
 
-        protected override Window CreateWindow(IActivationState? activationState)
+        NavigationPage loginNavigation = new(new LoginPage())
         {
-            return new Window(new AppShell());
+            BarBackgroundColor = Color.FromArgb("#163B2D"),
+            BarTextColor = Colors.White
+        };
+
+        return loginNavigation;
+    }
+
+    private void OnSessionChanged(object? sender, EventArgs e)
+    {
+        if (_window is null)
+        {
+            return;
         }
+
+        MainThread.BeginInvokeOnMainThread(() => _window.Page = CreateRootPage());
     }
 }

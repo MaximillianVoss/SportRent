@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:SportRent.Mobile.Models"
+             xmlns:viewModels="clr-namespace:SportRent.Mobile.ViewModels"
+             x:Class="SportRent.Mobile.Pages.OrdersPage"
+             x:DataType="viewModels:OrdersPageViewModel"
+             Title="Мои заказы"
+             BackgroundColor="#F3EEE4">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F8F4EC" Offset="0" />
+            <GradientStop Color="#EBF2EC" Offset="0.5" />
+            <GradientStop Color="#EEE5D7" Offset="1" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <Grid>
+        <RefreshView IsRefreshing="{Binding IsBusy}"
+                     Refreshing="OnRefreshRequested">
+            <CollectionView ItemsSource="{Binding Orders}"
+                            SelectionMode="None"
+                            Margin="0,0,0,12">
+                <CollectionView.Header>
+                    <VerticalStackLayout Padding="20,18,20,12"
+                                         Spacing="14">
+                        <Border BackgroundColor="#163B2D"
+                                Padding="20"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 28">
+                            <VerticalStackLayout Spacing="10">
+                                <Label Text="История аренды"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       TextColor="White" />
+                                <Label Text="Оформленные заказы, сроки аренды и платежи доступны офлайн из локальной базы."
+                                       FontSize="14"
+                                       TextColor="#E1EFE8"
+                                       LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border IsVisible="{Binding HasError}"
+                                BackgroundColor="#FFF1F0"
+                                Padding="14"
+                                Stroke="#E9A7A4"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 18">
+                            <Label Text="{Binding ErrorMessage}"
+                                   TextColor="#8C2F39"
+                                   LineBreakMode="WordWrap" />
+                        </Border>
+
+                        <Label Text="{Binding SummaryText}"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="#32473B" />
+                    </VerticalStackLayout>
+                </CollectionView.Header>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="24,18,24,40"
+                                         Spacing="8">
+                        <Label Text="Заказов пока нет"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#283630"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Открой карточку инвентаря в каталоге и оформи первую аренду."
+                               FontSize="14"
+                               TextColor="#68726B"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:UserOrder">
+                        <Border Margin="20,0,20,14"
+                                Padding="16"
+                                BackgroundColor="#FCFAF6"
+                                Stroke="#D8D1C2"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 26">
+                            <VerticalStackLayout Spacing="12">
+                                <Grid ColumnDefinitions="*,Auto"
+                                      ColumnSpacing="12">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="{Binding EquipmentSummary}"
+                                               FontSize="19"
+                                               FontAttributes="Bold"
+                                               TextColor="#1F2926" />
+                                        <Label Text="{Binding PointText}"
+                                               FontSize="13"
+                                               TextColor="#5C655F" />
+                                    </VerticalStackLayout>
+
+                                    <Border Grid.Column="1"
+                                            BackgroundColor="{Binding StatusBackgroundColor}"
+                                            Padding="12,8"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 18"
+                                            VerticalOptions="Start">
+                                        <Label Text="{Binding StatusTitle}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="{Binding StatusTextColor}" />
+                                    </Border>
+                                </Grid>
+
+                                <Label Text="{Binding ScheduleText}"
+                                       FontSize="14"
+                                       TextColor="#25332D" />
+
+                                <Label Text="{Binding CreatedText}"
+                                       FontSize="12"
+                                       TextColor="#6A746E" />
+
+                                <Grid ColumnDefinitions="*,*,*"
+                                      ColumnSpacing="10">
+                                    <Border Grid.Column="0"
+                                            BackgroundColor="#F4EFE4"
+                                            Padding="12"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 18">
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="Аренда"
+                                                   FontSize="12"
+                                                   TextColor="#68726B" />
+                                            <Label Text="{Binding AmountText}"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#1B4332" />
+                                        </VerticalStackLayout>
+                                    </Border>
+
+                                    <Border Grid.Column="1"
+                                            BackgroundColor="#F4EFE4"
+                                            Padding="12"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 18">
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="Залог"
+                                                   FontSize="12"
+                                                   TextColor="#68726B" />
+                                            <Label Text="{Binding DepositText}"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#3E423E" />
+                                        </VerticalStackLayout>
+                                    </Border>
+
+                                    <Border Grid.Column="2"
+                                            BackgroundColor="#F4EFE4"
+                                            Padding="12"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 18">
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="Итого"
+                                                   FontSize="12"
+                                                   TextColor="#68726B" />
+                                            <Label Text="{Binding TotalPaymentText}"
+                                                   FontSize="15"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#163B2D" />
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </Grid>
+
+                                <Label Text="{Binding PaymentText}"
+                                       FontSize="13"
+                                       TextColor="#52615A" />
+
+                                <Label Text="{Binding Description}"
+                                       FontSize="13"
+                                       TextColor="#68726B"
+                                       LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

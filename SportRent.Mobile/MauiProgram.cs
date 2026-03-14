@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
+using SportRent.Mobile.Services;
+using SportRent.Mobile.ViewModels;
 
 namespace SportRent.Mobile
 {
     public static class MauiProgram
     {
+        public static IServiceProvider Services { get; private set; } = null!;
+
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
@@ -16,10 +20,24 @@ namespace SportRent.Mobile
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
+            builder.Services.AddSingleton<ILocalDatabaseService, LocalDatabaseService>();
+            builder.Services.AddSingleton<IUserSessionService, UserSessionService>();
+            builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddSingleton<ISportRentCatalogService, SportRentCatalogService>();
+            builder.Services.AddSingleton<IOrdersService, OrdersService>();
+            builder.Services.AddTransient<LoginPageViewModel>();
+            builder.Services.AddTransient<MainPageViewModel>();
+            builder.Services.AddTransient<EquipmentDetailsPageViewModel>();
+            builder.Services.AddTransient<CreateOrderPageViewModel>();
+            builder.Services.AddTransient<OrdersPageViewModel>();
+            builder.Services.AddTransient<ProfilePageViewModel>();
+
+            MauiApp app = builder.Build();
+            Services = app.Services;
+            return app;
         }
     }
 }

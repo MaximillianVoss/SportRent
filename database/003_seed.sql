@@ -75,13 +75,13 @@ INSERT INTO equipmentSizes (title) VALUES
 
 -- =========================
 -- Тестовые пользователи
--- passwordHash пока заглушка
+-- passwordHash хранит демо-пароли для локальной авторизации
 -- =========================
 
-INSERT INTO users (idRole, firstName, lastName, phone, passwordHash) VALUES
-(1, 'Иван', 'Петров', '+79991111111', 'hash_client_1'),
-(2, 'Мария', 'Соколова', '+79992222222', 'hash_manager_1'),
-(3, 'Алексей', 'Иванов', '+79993333333', 'hash_admin_1');
+INSERT INTO users (idRole, firstName, lastName, email, phone, passwordHash) VALUES
+(1, 'Иван', 'Петров', 'ivan.petrov@sport-rent.local', '+79991111111', 'client123'),
+(2, 'Мария', 'Соколова', 'maria.sokolova@sport-rent.local', '+79992222222', 'manager123'),
+(3, 'Алексей', 'Иванов', 'alex.ivanov@sport-rent.local', '+79993333333', 'admin123');
 
 -- =========================
 -- Тестовый инвентарь
@@ -134,11 +134,11 @@ INSERT INTO rentalPointEquipment (
 (1, 5, 1, 1, 10, 9);
 
 INSERT INTO images (url) VALUES
-('https://example.com/bike1.jpg'),
-('https://example.com/ski1.jpg'),
-('https://example.com/board1.jpg'),
-('https://example.com/scooter1.jpg'),
-('https://example.com/helmet1.jpg');
+('https://commons.wikimedia.org/wiki/Special:FilePath/Mountainbike.jpg'),
+('https://commons.wikimedia.org/wiki/Special:FilePath/SkiCollection.jpg'),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Snowboarding.jpg'),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Electric%20Scooter.jpg'),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Bicycle%20Helmet.JPG');
 
 INSERT INTO equipmentPhotos (idEquipment, idImage) VALUES
 (1, 1),
