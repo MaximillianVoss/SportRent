@@ -1,0 +1,258 @@
+{
+  "document_type": "course_explanatory_note",
+  "language": "ru-RU",
+  "project_name": "SportRent",
+  "course_work_topic": "Разработка мобильного приложения для аренды спортивного инвентаря",
+  "repository_root": "c:/Users/FossW/source/repos/SportRent",
+  "solution_file": "SportRent.sln",
+  "author": {
+    "full_name": "Alexander Chaykovskiy",
+    "github_account": "MaximillianVoss",
+    "email": "fosswolfgang@hotmail.com"
+  },
+  "project_purpose": {
+    "summary": "Учебный курсовой проект, демонстрирующий проектирование базы данных и реализацию мобильного приложения для аренды спортивного инвентаря с локальной SQLite-базой.",
+    "goals": [
+      "Спроектировать предметную область аренды спортивного инвентаря.",
+      "Разработать нормализованную реляционную базу данных.",
+      "Реализовать мобильное приложение на .NET MAUI.",
+      "Поддержать авторизацию, каталог, оформление аренды, просмотр заказов и личный кабинет.",
+      "Обеспечить автономную демонстрацию проекта без серверной части."
+    ]
+  },
+  "technology_stack": {
+    "platform": ".NET 9",
+    "ui": ".NET MAUI",
+    "language": "C#",
+    "markup": "XAML",
+    "database": "SQLite",
+    "data_access": [
+      "Microsoft.Data.Sqlite",
+      "Entity Framework Core 9"
+    ],
+    "scripts": "PowerShell"
+  },
+  "projects": [
+    {
+      "name": "SportRent.Mobile",
+      "role": "Клиентское мобильное приложение",
+      "responsibilities": [
+        "Экран авторизации",
+        "Каталог инвентаря",
+        "Карточка инвентаря",
+        "Оформление заказа аренды",
+        "Просмотр заказов",
+        "Личный кабинет",
+        "Работа с локальной SQLite базой"
+      ]
+    },
+    {
+      "name": "SportRent.DbTool",
+      "role": "Инструмент сборки SQLite из SQL-скриптов",
+      "responsibilities": [
+        "Поиск SQL-скриптов формата 000_name.sql",
+        "Создание SQLite-базы",
+        "Последовательное выполнение SQL",
+        "Безопасственная замена выходного файла базы"
+      ]
+    },
+    {
+      "name": "SportRent.Data",
+      "role": "Слой данных",
+      "responsibilities": [
+        "Scaffolded EF Core сущности",
+        "DbContext",
+        "Повторная генерация моделей из SQLite"
+      ]
+    }
+  ],
+  "canonical_database_scripts": [
+    "database/001_recreate.sql",
+    "database/002_schema.sql",
+    "database/003_seed.sql"
+  ],
+  "database": {
+    "dbms": "SQLite",
+    "money_storage_rule": "Денежные значения хранятся в INTEGER, в копейках.",
+    "core_tables": [
+      "roles",
+      "users",
+      "categories",
+      "brands",
+      "equipmentTypes",
+      "equipmentSizes",
+      "equipmentConditions",
+      "rentalTypes",
+      "rentalPoints",
+      "equipment",
+      "equipmentRates",
+      "rentalPointEquipment",
+      "images",
+      "equipmentPhotos",
+      "orderStatuses",
+      "rentOrders",
+      "orderItems",
+      "paymentMethods",
+      "paymentStatuses",
+      "payments"
+    ],
+    "design_notes": [
+      "Тарифы аренды вынесены в equipmentRates.",
+      "Остатки инвентаря по точкам проката и размерам хранятся в rentalPointEquipment.",
+      "Изображения нормализованы через images и equipmentPhotos.",
+      "Позиция заказа связана с конкретным остатком rentalPointEquipment."
+    ]
+  },
+  "mobile_application": {
+    "architecture": "Упрощенный MVVM: Pages + ViewModels + Services + Models.",
+    "main_screens": [
+      "LoginPage",
+      "MainPage",
+      "EquipmentDetailsPage",
+      "CreateOrderPage",
+      "OrdersPage",
+      "ProfilePage"
+    ],
+    "navigation": {
+      "entry_point": "При отсутствии сессии открывается LoginPage; после входа открывается AppShell.",
+      "shell_tabs": [
+        "Каталог",
+        "Заказы",
+        "Профиль"
+      ]
+    },
+    "implemented_features": [
+      "Демо-авторизация по локальной базе",
+      "Просмотр каталога с фильтрацией и поиском",
+      "Просмотр карточки инвентаря",
+      "Локальные изображения инвентаря",
+      "Оформление аренды",
+      "Автоматическое создание платежа со статусом ожидания оплаты",
+      "Уменьшение остатка availableQuantity при создании заказа",
+      "Просмотр истории заказов",
+      "Просмотр личного кабинета",
+      "Выход из аккаунта"
+    ]
+  },
+  "demo_data": {
+    "accounts": [
+      {
+        "role": "Клиент",
+        "email": "ivan.petrov@sport-rent.local",
+        "password": "client123"
+      },
+      {
+        "role": "Менеджер",
+        "email": "maria.sokolova@sport-rent.local",
+        "password": "manager123"
+      },
+      {
+        "role": "Администратор",
+        "email": "alex.ivanov@sport-rent.local",
+        "password": "admin123"
+      }
+    ],
+    "equipment_examples": [
+      "Горный велосипед",
+      "Лыжный комплект",
+      "Сноуборд",
+      "Электросамокат",
+      "Шлем защитный"
+    ],
+    "seed_order_exists": true
+  },
+  "image_strategy": {
+    "storage_mode": "Локальные MAUI-ресурсы",
+    "resource_folder": "SportRent.Mobile/Resources/Images",
+    "image_asset_names": [
+      "equipment_bike.jpg",
+      "equipment_skis.jpg",
+      "equipment_snowboard.jpg",
+      "equipment_scooter.jpg",
+      "equipment_helmet.jpg"
+    ],
+    "why_used": [
+      "Не зависит от доступа в интернет",
+      "Подходит для стабильной демонстрации на защите",
+      "Исключает проблемы с внешними URL"
+    ]
+  },
+  "database_build_pipeline": {
+    "tool": "SportRent.DbTool",
+    "default_output": "SportRent.Mobile/Resources/Raw/Database/sportRent.db",
+    "example_command": "dotnet run --project SportRent.DbTool -- --root . --scripts-dir database --output SportRent.Mobile\\\\Resources\\\\Raw\\\\Database\\\\sportRent.db",
+    "pipeline_steps": [
+      "Поиск SQL-скриптов в папке database",
+      "Сортировка по имени",
+      "Создание временного SQLite файла",
+      "Выполнение SQL в транзакции",
+      "Замена итоговой БД после успешного выполнения"
+    ]
+  },
+  "ef_scaffold_pipeline": {
+    "script": "SportRent.Data/scaffold.ps1",
+    "result": [
+      "SportRent.Data/Context/SportRentDbContext.cs",
+      "SportRent.Data/Entities/*.cs"
+    ]
+  },
+  "launch_and_verification": {
+    "verified_commands": [
+      "dotnet run --project SportRent.DbTool -- --root . --scripts-dir database --output SportRent.Mobile\\\\Resources\\\\Raw\\\\Database\\\\sportRent.db",
+      "dotnet build SportRent.Mobile\\\\SportRent.Mobile.csproj -f net9.0-windows10.0.19041.0"
+    ],
+    "verified_platform": "Windows target net9.0-windows10.0.19041.0"
+  },
+  "important_limitations": [
+    "Авторизация демонстрационная; passwordHash в seed-данных содержит демо-пароли без криптографического хеширования.",
+    "Серверная часть отсутствует.",
+    "Синхронизация с удаленной БД отсутствует.",
+    "Реальная платежная интеграция отсутствует.",
+    "Автоматизированные тесты не реализованы.",
+    "Основной проверенный сценарий относится к Windows-сборке MAUI."
+  ],
+  "mandatory_facts_for_explanatory_note": [
+    "Проект является курсовой работой по теме разработки мобильного приложения для аренды спортивного инвентаря.",
+    "Приложение работает с локальной SQLite-базой данных.",
+    "База данных создается из SQL-скриптов с помощью отдельного инструмента DbTool.",
+    "Сущности EF Core генерируются из SQLite через scaffold.",
+    "В приложении реализованы авторизация, каталог, карточка инвентаря, оформление заказа, история заказов и профиль."
+  ],
+  "writing_guidelines_for_ai_agent": {
+    "style": "учебно-технический, академичный, без маркетинговых формулировок",
+    "audience": "преподаватель и комиссия по защите курсовой работы",
+    "must_not_do": [
+      "Не выдумывать веб-сервер, API, облачную инфраструктуру или функции, которых нет в коде.",
+      "Не утверждать наличие защищенной боевой авторизации.",
+      "Не утверждать наличие production-ready безопасности или промышленной отказоустойчивости.",
+      "Не писать, что проект является полностью завершенной коммерческой системой."
+    ],
+    "should_emphasize": [
+      "Нормализацию структуры БД",
+      "Наличие отдельного инструмента сборки SQLite",
+      "Автономность демонстрационного сценария",
+      "Практическую реализацию пользовательских сценариев",
+      "Соответствие темы курсовой работы фактически созданному приложению"
+    ],
+    "recommended_sections": [
+      "Введение",
+      "Анализ предметной области",
+      "Постановка задачи",
+      "Проектирование базы данных",
+      "Проектирование приложения",
+      "Реализация программного средства",
+      "Тестирование и проверка работоспособности",
+      "Заключение"
+    ]
+  },
+  "fact_sources_inside_repo": [
+    "README.md",
+    "SportRent.DbTool/Program.cs",
+    "SportRent.Data/scaffold.ps1",
+    "SportRent.Mobile/Pages",
+    "SportRent.Mobile/ViewModels",
+    "SportRent.Mobile/Services",
+    "database/002_schema.sql",
+    "database/003_seed.sql"
+  ]
+}
