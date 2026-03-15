@@ -48,7 +48,7 @@
 - поиск нумерованных SQL-скриптов в папке `database`;
 - последовательное выполнение скриптов;
 - создание итогового файла базы данных;
-- безопасственная замена существующей БД через временный файл;
+- безопасная замена существующей БД через временный файл;
 - возможность указать корень проекта, директорию скриптов и путь вывода.
 
 ### `SportRent.Data`
@@ -120,7 +120,7 @@ SportRent/
 1. встраивается в ресурсы приложения;
 2. при первом запуске копируется в `AppDataDirectory`;
 3. используется как рабочая локальная БД;
-4. может пересоздаваться при изменении версии packaged database.
+4. может пересоздаваться при изменении версии встроенной базы данных.
 
 Это позволяет:
 
@@ -134,9 +134,9 @@ SportRent/
 
 Единственным источником истины по схеме БД являются файлы:
 
-- [database/001_recreate.sql](/c:/Users/FossW/source/repos/SportRent/database/001_recreate.sql)
-- [database/002_schema.sql](/c:/Users/FossW/source/repos/SportRent/database/002_schema.sql)
-- [database/003_seed.sql](/c:/Users/FossW/source/repos/SportRent/database/003_seed.sql)
+- [database/001_recreate.sql](database/001_recreate.sql)
+- [database/002_schema.sql](database/002_schema.sql)
+- [database/003_seed.sql](database/003_seed.sql)
 
 Черновые SQL-файлы в папке `database`, не входящие в цепочку `001/002/003`, не используются в рабочем pipeline.
 
@@ -340,12 +340,12 @@ dotnet build SportRent.Mobile\SportRent.Mobile.csproj -f net9.0-windows10.0.1904
 
 При первом запуске:
 
-1. packaged database копируется в локальную рабочую директорию приложения;
+1. встроенная база данных копируется в локальную рабочую директорию приложения;
 2. открывается экран входа;
 3. уже подставлены данные клиента;
 4. после входа становится доступен каталог и дальнейшие пользовательские сценарии.
 
-Если packaged database была обновлена, приложение пересоздаст рабочую копию на старте автоматически.
+Если встроенная база данных была обновлена, приложение пересоздаст рабочую копию на старте автоматически.
 
 ## Демонстрационные данные
 
@@ -436,7 +436,7 @@ dotnet build SportRent.Mobile\SportRent.Mobile.csproj -f net9.0-windows10.0.1904
 
 Для подготовки пояснительной записки в проект добавлен отдельный технический контекст:
 
-- [docs/explanatory-note-agent-context.json](/c:/Users/FossW/source/repos/SportRent/docs/explanatory-note-agent-context.json)
+- [docs/explanatory-note-agent-context.json](docs/explanatory-note-agent-context.json)
 
 Этот файл предназначен для ИИ-агента, который будет писать пояснительную записку строго на основе фактов проекта.
 
