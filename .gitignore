@@ -363,3 +363,12 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Temporary document rendering artifacts
+tmp/
+
+# Non-canonical generated document duplicates
+output/doc/Профиль для ИИ агента - ВКР по ГОСТ.docx
+output/doc/Профиль для ИИ агента - ВКР по ГОСТ.pdf
+output/doc/SportRent-explanatory-note.docx
+output/doc/SportRent-explanatory-note.pdf
