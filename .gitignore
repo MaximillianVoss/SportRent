@@ -198,6 +198,7 @@ PublishScripts/
 *.snupkg
 .dotnet/
 SportRent.Mobile/Resources/Raw/Database/*.db
+SportRentSolution/SportRent.Mobile/Resources/Raw/Database/*.db
 # The packages folder can be ignored because of Package Restore
 **/[Pp]ackages/*
 # except build/, which is used as an MSBuild target.
@@ -372,3 +373,7 @@ output/doc/Профиль для ИИ агента - ВКР по ГОСТ.docx
 output/doc/Профиль для ИИ агента - ВКР по ГОСТ.pdf
 output/doc/SportRent-explanatory-note.docx
 output/doc/SportRent-explanatory-note.pdf
+SportRentSolution/output/doc/Профиль для ИИ агента - ВКР по ГОСТ.docx
+SportRentSolution/output/doc/Профиль для ИИ агента - ВКР по ГОСТ.pdf
+SportRentSolution/output/doc/SportRent-explanatory-note.docx
+SportRentSolution/output/doc/SportRent-explanatory-note.pdf
