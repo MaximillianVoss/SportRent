@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:SportRent.Mobile.Models"
+             xmlns:viewModels="clr-namespace:SportRent.Mobile.ViewModels"
+             x:Class="SportRent.Mobile.MainPage"
+             x:Name="RootPage"
+             x:DataType="viewModels:MainPageViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#EFE8DA">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F6F2E9" Offset="0" />
+            <GradientStop Color="#E7F0EA" Offset="0.45" />
+            <GradientStop Color="#EAE3D4" Offset="1" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <Grid>
+        <RefreshView Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding VisibleEquipment}"
+                            Margin="0,0,0,12"
+                            SelectionMode="None">
+                <CollectionView.Header>
+                    <VerticalStackLayout Padding="20,18,20,12"
+                                         Spacing="18">
+                        <Border BackgroundColor="#163B2D"
+                                Padding="20"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 28">
+                            <VerticalStackLayout Spacing="14">
+                                <Label Text="SportRent"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       TextColor="#B9D6C8" />
+                                <Label Text="Аренда спортивного инвентаря"
+                                       FontSize="28"
+                                       FontAttributes="Bold"
+                                       TextColor="White"
+                                       LineBreakMode="WordWrap" />
+                                <Label Text="{Binding OverviewText}"
+                                       FontSize="15"
+                                       TextColor="#E1EFE8"
+                                       LineBreakMode="WordWrap" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Grid ColumnDefinitions="*,*,*"
+                              ColumnSpacing="10">
+                            <Border Grid.Column="0"
+                                    BackgroundColor="#F8F4EC"
+                                    Padding="14"
+                                    Stroke="#D7D1C0"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 20">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding TotalEquipmentMetric}"
+                                           FontSize="26"
+                                           FontAttributes="Bold"
+                                           TextColor="#1D2D2A" />
+                                    <Label Text="Инвентарь"
+                                           FontSize="12"
+                                           TextColor="#6C7068" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="1"
+                                    BackgroundColor="#F8F4EC"
+                                    Padding="14"
+                                    Stroke="#D7D1C0"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 20">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding TotalRentalPointsMetric}"
+                                           FontSize="26"
+                                           FontAttributes="Bold"
+                                           TextColor="#1D2D2A" />
+                                    <Label Text="Пункты"
+                                           FontSize="12"
+                                           TextColor="#6C7068" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Column="2"
+                                    BackgroundColor="#F8F4EC"
+                                    Padding="14"
+                                    Stroke="#D7D1C0"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 20">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding TotalCategoriesMetric}"
+                                           FontSize="26"
+                                           FontAttributes="Bold"
+                                           TextColor="#1D2D2A" />
+                                    <Label Text="Категории"
+                                           FontSize="12"
+                                           TextColor="#6C7068" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+
+                        <Border IsVisible="{Binding HasError}"
+                                BackgroundColor="#FFF1F0"
+                                Padding="14"
+                                Stroke="#E9A7A4"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 18">
+                            <Label Text="{Binding ErrorMessage}"
+                                   TextColor="#8C2F39"
+                                   LineBreakMode="WordWrap" />
+                        </Border>
+
+                        <Border BackgroundColor="#F8F4EC"
+                                Padding="6,4"
+                                Stroke="#D7D1C0"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 22">
+                            <SearchBar Placeholder="Поиск по названию, бренду или категории"
+                                       Text="{Binding SearchText}"
+                                       BackgroundColor="Transparent"
+                                       FontSize="15"
+                                       CancelButtonColor="#163B2D" />
+                        </Border>
+
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Категории"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="#344A3D" />
+                            <ScrollView Orientation="Horizontal">
+                                <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Categories}"
+                                                       Spacing="8">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="viewModels:CategoryChipViewModel">
+                                            <Button Text="{Binding Title}"
+                                                    Padding="16,8"
+                                                    CornerRadius="18"
+                                                    BackgroundColor="{Binding ChipBackgroundColor}"
+                                                    BorderColor="{Binding ChipBorderColor}"
+                                                    BorderWidth="1"
+                                                    TextColor="{Binding ChipTextColor}"
+                                                    Clicked="OnCategoryChipClicked" />
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </HorizontalStackLayout>
+                            </ScrollView>
+                        </VerticalStackLayout>
+
+                        <Label Text="{Binding ResultsSummary}"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="#32473B" />
+                    </VerticalStackLayout>
+                </CollectionView.Header>
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="24,18,24,40"
+                                         Spacing="8">
+                        <Label Text="Подходящий инвентарь не найден"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="#283630"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Сними фильтры или измени поисковый запрос."
+                               FontSize="14"
+                               TextColor="#68726B"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:CatalogEquipmentItem">
+                        <Border Margin="20,0,20,14"
+                                Padding="16"
+                                BackgroundColor="#FCFAF6"
+                                Stroke="#D8D1C2"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 26">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnEquipmentTapped" />
+                            </Border.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="84,*"
+                                  ColumnSpacing="14"
+                                  RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                <Border Grid.RowSpan="5"
+                                        BackgroundColor="{Binding AccentSurfaceColor}"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 22"
+                                        HeightRequest="84"
+                                        WidthRequest="84"
+                                        VerticalOptions="Start">
+                                    <Grid>
+                                        <Image Source="{Binding ImageUrl}"
+                                               Aspect="AspectFill" />
+                                        <Border BackgroundColor="#CCFFFFFF"
+                                                StrokeThickness="0"
+                                                Padding="8,4"
+                                                StrokeShape="RoundRectangle 14"
+                                                HorizontalOptions="End"
+                                                VerticalOptions="End"
+                                                Margin="0,0,8,8">
+                                            <Label Text="{Binding SymbolText}"
+                                                   FontSize="11"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{Binding AccentColor}" />
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <Label Grid.Column="1"
+                                       Text="{Binding Title}"
+                                       FontSize="19"
+                                       FontAttributes="Bold"
+                                       TextColor="#1F2926" />
+
+                                <Label Grid.Column="1"
+                                       Grid.Row="1"
+                                       Text="{Binding CategoryTitle}"
+                                       FontSize="12"
+                                       TextColor="{Binding AccentColor}" />
+
+                                <Label Grid.Column="1"
+                                       Grid.Row="2"
+                                       Text="{Binding BrandModelText}"
+                                       FontSize="14"
+                                       TextColor="#4A5450" />
+
+                                <Label Grid.Column="1"
+                                       Grid.Row="3"
+                                       Text="{Binding DescriptionText}"
+                                       FontSize="13"
+                                       TextColor="#68726B"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="2" />
+
+                                <Grid Grid.Column="1"
+                                      Grid.Row="4"
+                                      ColumnDefinitions="*,Auto"
+                                      ColumnSpacing="8"
+                                      Margin="0,10,0,0">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="{Binding PriceText}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               TextColor="#1B4332" />
+                                        <Label Text="{Binding AvailabilityText}"
+                                               FontSize="12"
+                                               TextColor="#51615A" />
+                                    </VerticalStackLayout>
+
+                                    <Border Grid.Column="1"
+                                            BackgroundColor="#F2ECE0"
+                                            Padding="10,6"
+                                            StrokeThickness="0"
+                                            StrokeShape="RoundRectangle 16"
+                                            VerticalOptions="Center">
+                                        <Label Text="{Binding DepositText}"
+                                               FontSize="12"
+                                               TextColor="#5C544B" />
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <Grid IsVisible="{Binding IsBusy}"
+              BackgroundColor="#66F3EEE4">
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               Color="#163B2D"
+                               HeightRequest="48"
+                               WidthRequest="48"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

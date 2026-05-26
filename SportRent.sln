@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36930.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportRent.Mobile", "SportRent.Mobile\SportRent.Mobile.csproj", "{ED8D5BEC-ADA6-4385-B107-168F17F5601A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportRent.Data", "SportRent.Data\SportRent.Data.csproj", "{5E469174-251E-4099-9806-3715F7329807}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportRent.DbTool", "SportRent.DbTool\SportRent.DbTool.csproj", "{BB116186-20A3-49CC-A930-7C7B8574A8E6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}"
+	ProjectSection(SolutionItems) = preProject
+		database\001_recreate.sql = database\001_recreate.sql
+		database\002_schema.sql = database\002_schema.sql
+		database\003_seed.sql = database\003_seed.sql
+		database\БД.Схема.Аренда инвенторя.xml = database\БД.Схема.Аренда инвенторя.xml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED8D5BEC-ADA6-4385-B107-168F17F5601A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED8D5BEC-ADA6-4385-B107-168F17F5601A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED8D5BEC-ADA6-4385-B107-168F17F5601A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{ED8D5BEC-ADA6-4385-B107-168F17F5601A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED8D5BEC-ADA6-4385-B107-168F17F5601A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E469174-251E-4099-9806-3715F7329807}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E469174-251E-4099-9806-3715F7329807}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E469174-251E-4099-9806-3715F7329807}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E469174-251E-4099-9806-3715F7329807}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB116186-20A3-49CC-A930-7C7B8574A8E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB116186-20A3-49CC-A930-7C7B8574A8E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB116186-20A3-49CC-A930-7C7B8574A8E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB116186-20A3-49CC-A930-7C7B8574A8E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AC3B4390-CFD7-4DD4-AAF8-849D916D779E}
+	EndGlobalSection
+EndGlobal

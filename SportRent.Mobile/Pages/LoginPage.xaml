@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:SportRent.Mobile.Models"
+             xmlns:viewModels="clr-namespace:SportRent.Mobile.ViewModels"
+             x:Class="SportRent.Mobile.Pages.LoginPage"
+             x:DataType="viewModels:LoginPageViewModel"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#EFE8DA">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F7F3EB" Offset="0" />
+            <GradientStop Color="#EBF2EC" Offset="0.5" />
+            <GradientStop Color="#EEE3D3" Offset="1" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <Grid>
+        <ScrollView>
+            <VerticalStackLayout Padding="22,28,22,28"
+                                 Spacing="18">
+                <Border BackgroundColor="#163B2D"
+                        Padding="22"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 28">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="SportRent"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               TextColor="#B9D6C8" />
+                        <Label Text="Аренда спортивного инвентаря"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               LineBreakMode="WordWrap" />
+                        <Label Text="Для проверки проекта уже подготовлены демо-аккаунты. Почта и пароль предзаполнены."
+                               FontSize="14"
+                               TextColor="#E1EFE8"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border BackgroundColor="#FCFAF6"
+                        Padding="18"
+                        Stroke="#D7D1C0"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 24">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Вход в систему"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="#1E2925" />
+
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Почта"
+                                   FontSize="13"
+                                   TextColor="#57615B" />
+                            <Entry Text="{Binding Email}"
+                                   Keyboard="Email"
+                                   Placeholder="you@example.com"
+                                   BackgroundColor="#F3EEE4"
+                                   TextColor="#182320"
+                                   PlaceholderColor="#889189" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Пароль"
+                                   FontSize="13"
+                                   TextColor="#57615B" />
+                            <Entry Text="{Binding Password}"
+                                   Placeholder="Пароль"
+                                   BackgroundColor="#F3EEE4"
+                                   TextColor="#182320"
+                                   PlaceholderColor="#889189" />
+                        </VerticalStackLayout>
+
+                        <Border IsVisible="{Binding HasError}"
+                                BackgroundColor="#FFF1F0"
+                                Padding="14"
+                                Stroke="#E9A7A4"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 18">
+                            <Label Text="{Binding ErrorMessage}"
+                                   TextColor="#8C2F39"
+                                   LineBreakMode="WordWrap" />
+                        </Border>
+
+                        <Button Text="Войти"
+                                Clicked="OnSignInClicked"
+                                BackgroundColor="#163B2D"
+                                TextColor="White"
+                                CornerRadius="20"
+                                Padding="16,14" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Демо-аккаунты"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="#21342D" />
+
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding DemoAccounts}"
+                                         Spacing="10">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:DemoAccount">
+                                <Border BackgroundColor="#FCFAF6"
+                                        Padding="16"
+                                        Stroke="#D7D1C0"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 22">
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          ColumnSpacing="12">
+                                        <VerticalStackLayout Spacing="4">
+                                            <Label Text="{Binding DisplayName}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#24322D" />
+                                            <Label Text="{Binding Subtitle}"
+                                                   FontSize="13"
+                                                   TextColor="#637068" />
+                                            <Label Text="{Binding Password, StringFormat='Пароль: {0}'}"
+                                                   FontSize="13"
+                                                   TextColor="#44514B" />
+                                        </VerticalStackLayout>
+
+                                        <Button Grid.Column="1"
+                                                Text="Подставить"
+                                                Clicked="OnDemoAccountClicked"
+                                                BackgroundColor="#F1EBDF"
+                                                TextColor="#163B2D"
+                                                CornerRadius="16"
+                                                Padding="14,10"
+                                                VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding IsBusy}"
+              BackgroundColor="#66F3EEE4">
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               Color="#163B2D"
+                               HeightRequest="48"
+                               WidthRequest="48"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>
