@@ -15,6 +15,11 @@ public partial class EquipmentDetailsPage : ContentPage, IQueryAttributable
 
     private EquipmentDetailsPageViewModel ViewModel => (EquipmentDetailsPageViewModel)BindingContext;
 
+    private async void OnBackToCatalogClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//catalog", true);
+    }
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (!query.TryGetValue("equipmentId", out object? rawValue) || rawValue is null)

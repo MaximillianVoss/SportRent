@@ -19,6 +19,16 @@
         <ScrollView>
             <VerticalStackLayout Padding="20,20,20,28"
                                  Spacing="18">
+                <Button Text="← Назад к каталогу"
+                        Clicked="OnBackToCatalogClicked"
+                        HorizontalOptions="Start"
+                        BackgroundColor="#FCFAF6"
+                        TextColor="#163B2D"
+                        BorderColor="#D7D1C0"
+                        BorderWidth="1"
+                        CornerRadius="18"
+                        Padding="14,8" />
+
                 <Border BackgroundColor="{Binding AccentColor}"
                         Padding="20"
                         StrokeThickness="0"
