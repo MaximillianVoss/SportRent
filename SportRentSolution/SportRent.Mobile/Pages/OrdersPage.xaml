@@ -178,6 +178,16 @@
                                         CornerRadius="18"
                                         Padding="16,12" />
 
+                                <Button Text="Отменить заказ"
+                                        IsVisible="{Binding CanCancel}"
+                                        Clicked="OnCancelOrderClicked"
+                                        BackgroundColor="#FCFAF6"
+                                        TextColor="#8C2F39"
+                                        BorderColor="#E0B3AD"
+                                        BorderWidth="1"
+                                        CornerRadius="18"
+                                        Padding="16,12" />
+
                                 <Label Text="{Binding Description}"
                                        FontSize="13"
                                        TextColor="#68726B"

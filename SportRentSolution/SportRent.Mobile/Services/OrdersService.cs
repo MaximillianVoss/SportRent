@@ -376,6 +376,96 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
         await transaction.CommitAsync(cancellationToken);
     }
 
+    public async Task CancelOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default)
+    {
+        await using SqliteConnection connection = await OpenConnectionAsync(readOnly: false, cancellationToken);
+        await using SqliteTransaction transaction = (SqliteTransaction)await connection.BeginTransactionAsync(cancellationToken);
+
+        int pendingPaymentStatusId = await GetLookupIdAsync(connection, transaction, "paymentStatuses", "Ожидает оплаты", cancellationToken);
+        int createdOrderStatusId = await GetLookupIdAsync(connection, transaction, "orderStatuses", "Создан", cancellationToken);
+        int canceledOrderStatusId = await GetLookupIdAsync(connection, transaction, "orderStatuses", "Отменен", cancellationToken);
+
+        SqliteCommand orderCommand = connection.CreateCommand();
+        orderCommand.Transaction = transaction;
+        orderCommand.CommandText = """
+            SELECT idStatus
+            FROM rentOrders
+            WHERE id = $orderId
+              AND idUser = $userId
+            LIMIT 1;
+            """;
+        orderCommand.Parameters.AddWithValue("$orderId", orderId);
+        orderCommand.Parameters.AddWithValue("$userId", userId);
+
+        object? orderStatusRaw = await orderCommand.ExecuteScalarAsync(cancellationToken);
+        if (orderStatusRaw is null)
+        {
+            throw new InvalidOperationException("Заказ не найден или принадлежит другому пользователю.");
+        }
+
+        int orderStatusId = Convert.ToInt32(orderStatusRaw);
+        if (orderStatusId != createdOrderStatusId)
+        {
+            throw new InvalidOperationException("Можно отменить только созданный неоплаченный заказ.");
+        }
+
+        SqliteCommand paymentCommand = connection.CreateCommand();
+        paymentCommand.Transaction = transaction;
+        paymentCommand.CommandText = """
+            SELECT idStatus
+            FROM payments
+            WHERE idOrder = $orderId
+            ORDER BY id DESC
+            LIMIT 1;
+            """;
+        paymentCommand.Parameters.AddWithValue("$orderId", orderId);
+
+        object? paymentStatusRaw = await paymentCommand.ExecuteScalarAsync(cancellationToken);
+        if (paymentStatusRaw is null || Convert.ToInt32(paymentStatusRaw) != pendingPaymentStatusId)
+        {
+            throw new InvalidOperationException("Заказ не ожидает оплаты и не может быть отменен.");
+        }
+
+        SqliteCommand restoreStockCommand = connection.CreateCommand();
+        restoreStockCommand.Transaction = transaction;
+        restoreStockCommand.CommandText = """
+            UPDATE rentalPointEquipment
+            SET availableQuantity = availableQuantity + (
+                SELECT COALESCE(SUM(oi.quantity), 0)
+                FROM orderItems oi
+                WHERE oi.idOrder = $orderId
+                  AND oi.idRentalPointEquipment = rentalPointEquipment.id
+            )
+            WHERE id IN (
+                SELECT idRentalPointEquipment
+                FROM orderItems
+                WHERE idOrder = $orderId
+            );
+            """;
+        restoreStockCommand.Parameters.AddWithValue("$orderId", orderId);
+
+        int restoredRows = await restoreStockCommand.ExecuteNonQueryAsync(cancellationToken);
+        if (restoredRows == 0)
+        {
+            throw new InvalidOperationException("Не найдены позиции заказа для возврата остатка.");
+        }
+
+        SqliteCommand updateOrderCommand = connection.CreateCommand();
+        updateOrderCommand.Transaction = transaction;
+        updateOrderCommand.CommandText = """
+            UPDATE rentOrders
+            SET idStatus = $canceledStatusId
+            WHERE id = $orderId
+              AND idUser = $userId;
+            """;
+        updateOrderCommand.Parameters.AddWithValue("$canceledStatusId", canceledOrderStatusId);
+        updateOrderCommand.Parameters.AddWithValue("$orderId", orderId);
+        updateOrderCommand.Parameters.AddWithValue("$userId", userId);
+
+        await updateOrderCommand.ExecuteNonQueryAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+    }
+
     private static async Task<int> GetLookupIdAsync(
         SqliteConnection connection,
         SqliteTransaction transaction,

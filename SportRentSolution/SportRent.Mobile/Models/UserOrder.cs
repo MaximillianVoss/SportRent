@@ -43,12 +43,21 @@ public sealed class UserOrder
     public string TotalPaymentText => DisplayFormatter.ToCurrency(TotalPaymentAmount);
 
     public string PaymentText =>
+        IsCanceled ? "Платеж отменен" :
         string.IsNullOrWhiteSpace(PaymentMethodTitle) || string.IsNullOrWhiteSpace(PaymentStatusTitle)
             ? "Платеж еще не зарегистрирован"
             : $"{PaymentMethodTitle} · {PaymentStatusTitle}";
 
+    public bool IsCanceled =>
+        string.Equals(StatusTitle, "Отменен", StringComparison.OrdinalIgnoreCase);
+
     public bool IsPaymentPending =>
+        !IsCanceled &&
         string.Equals(PaymentStatusTitle, "Ожидает оплаты", StringComparison.OrdinalIgnoreCase);
+
+    public bool CanCancel =>
+        IsPaymentPending &&
+        string.Equals(StatusTitle, "Создан", StringComparison.OrdinalIgnoreCase);
 
     public string PointText =>
         string.IsNullOrWhiteSpace(ReturnPointName) || string.Equals(ReturnPointName, IssuePointName, StringComparison.Ordinal)

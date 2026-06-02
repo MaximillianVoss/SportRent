@@ -134,8 +134,10 @@ public sealed class AuthenticationService : SqliteServiceBase, IAuthenticationSe
                     FROM payments p
                     INNER JOIN paymentStatuses ps ON ps.id = p.idStatus
                     INNER JOIN rentOrders ro ON ro.id = p.idOrder
+                    INNER JOIN orderStatuses os ON os.id = ro.idStatus
                     WHERE ro.idUser = u.id
                       AND ps.title = 'Ожидает оплаты'
+                      AND os.title <> 'Отменен'
                 ), 0) AS outstandingAmount
             FROM users u
             INNER JOIN roles r ON r.id = u.idRole

@@ -48,6 +48,48 @@ public sealed class OrdersPageViewModel : ViewModelBase
 
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
+    public async Task<bool> CancelOrderAsync(UserOrder order, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(order);
+
+        if (IsBusy)
+        {
+            return false;
+        }
+
+        UserSession? currentUser = _userSessionService.CurrentUser;
+        if (currentUser is null)
+        {
+            ErrorMessage = "Пользовательская сессия отсутствует.";
+            return false;
+        }
+
+        if (!order.CanCancel)
+        {
+            ErrorMessage = "Этот заказ нельзя отменить через приложение.";
+            return false;
+        }
+
+        try
+        {
+            IsBusy = true;
+            ErrorMessage = null;
+
+            await _ordersService.CancelOrderAsync(currentUser.UserId, order.Id, cancellationToken);
+            await InitializeAsync(forceRefresh: true, cancellationToken);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            return false;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     public async Task<bool> PayOrderAsync(UserOrder order, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(order);

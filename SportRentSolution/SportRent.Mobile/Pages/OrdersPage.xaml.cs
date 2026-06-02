@@ -48,4 +48,29 @@ public partial class OrdersPage : ContentPage
             await DisplayAlert("Оплата выполнена", $"Заказ #{order.Id} оплачен тестовым платежом.", "OK");
         }
     }
+
+    private async void OnCancelOrderClicked(object? sender, EventArgs e)
+    {
+        if ((sender as BindableObject)?.BindingContext is not UserOrder order)
+        {
+            return;
+        }
+
+        bool shouldCancel = await DisplayAlert(
+            "Отмена заказа",
+            $"Отменить заказ #{order.Id}? Инвентарь снова станет доступен в каталоге.",
+            "Отменить",
+            "Назад");
+
+        if (!shouldCancel)
+        {
+            return;
+        }
+
+        bool isCanceled = await ViewModel.CancelOrderAsync(order);
+        if (isCanceled)
+        {
+            await DisplayAlert("Заказ отменен", $"Заказ #{order.Id} отменен.", "OK");
+        }
+    }
 }

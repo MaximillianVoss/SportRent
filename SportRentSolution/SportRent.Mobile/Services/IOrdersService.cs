@@ -9,4 +9,6 @@ public interface IOrdersService
     Task<int> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken = default);
 
     Task PayOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default);
+
+    Task CancelOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default);
 }
