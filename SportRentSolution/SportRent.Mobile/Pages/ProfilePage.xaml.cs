@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SportRent.Mobile.Infrastructure;
 using SportRent.Mobile.ViewModels;
 
 namespace SportRent.Mobile.Pages;
@@ -14,6 +15,14 @@ public partial class ProfilePage : ContentPage
     }
 
     private ProfilePageViewModel ViewModel => (ProfilePageViewModel)BindingContext;
+
+    /// <summary>
+    /// Returns from the profile screen to the catalog tab.
+    /// </summary>
+    private async void OnBackToCatalogClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(AppRoutes.Catalog, true);
+    }
 
     protected override async void OnAppearing()
     {

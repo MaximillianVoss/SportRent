@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SportRent.Mobile.Infrastructure;
 using SportRent.Mobile.ViewModels;
 
 namespace SportRent.Mobile.Pages;
@@ -15,9 +16,12 @@ public partial class CreateOrderPage : ContentPage, IQueryAttributable
 
     private CreateOrderPageViewModel ViewModel => (CreateOrderPageViewModel)BindingContext;
 
+    /// <summary>
+    /// Returns from order creation to the catalog tab.
+    /// </summary>
     private async void OnBackToCatalogClicked(object? sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//catalog", true);
+        await Shell.Current.GoToAsync(AppRoutes.Catalog, true);
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -94,6 +98,6 @@ public partial class CreateOrderPage : ContentPage, IQueryAttributable
         }
 
         await DisplayAlert("Заказ оформлен", $"Заказ #{orderId.Value} добавлен в историю.", "OK");
-        await Shell.Current.GoToAsync("//orders");
+        await Shell.Current.GoToAsync(AppRoutes.Orders);
     }
 }

@@ -48,13 +48,22 @@ public sealed class UserOrder
             ? "Платеж еще не зарегистрирован"
             : $"{PaymentMethodTitle} · {PaymentStatusTitle}";
 
+    /// <summary>
+    /// Indicates that the order is closed by user cancellation.
+    /// </summary>
     public bool IsCanceled =>
         string.Equals(StatusTitle, "Отменен", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Indicates that the order still has a mock payment waiting for completion.
+    /// </summary>
     public bool IsPaymentPending =>
         !IsCanceled &&
         string.Equals(PaymentStatusTitle, "Ожидает оплаты", StringComparison.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Allows the UI to show cancellation only for created unpaid orders.
+    /// </summary>
     public bool CanCancel =>
         IsPaymentPending &&
         string.Equals(StatusTitle, "Создан", StringComparison.OrdinalIgnoreCase);

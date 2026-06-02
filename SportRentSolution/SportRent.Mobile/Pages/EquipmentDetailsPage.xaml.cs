@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SportRent.Mobile.Infrastructure;
 using SportRent.Mobile.ViewModels;
 
 namespace SportRent.Mobile.Pages;
@@ -15,9 +16,12 @@ public partial class EquipmentDetailsPage : ContentPage, IQueryAttributable
 
     private EquipmentDetailsPageViewModel ViewModel => (EquipmentDetailsPageViewModel)BindingContext;
 
+    /// <summary>
+    /// Returns from the equipment card to the catalog tab.
+    /// </summary>
     private async void OnBackToCatalogClicked(object? sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//catalog", true);
+        await Shell.Current.GoToAsync(AppRoutes.Catalog, true);
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)

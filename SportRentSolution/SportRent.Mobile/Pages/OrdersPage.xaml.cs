@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SportRent.Mobile.Infrastructure;
 using SportRent.Mobile.Models;
 using SportRent.Mobile.ViewModels;
 
@@ -15,6 +16,14 @@ public partial class OrdersPage : ContentPage
     }
 
     private OrdersPageViewModel ViewModel => (OrdersPageViewModel)BindingContext;
+
+    /// <summary>
+    /// Returns from order history to the catalog tab.
+    /// </summary>
+    private async void OnBackToCatalogClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(AppRoutes.Catalog, true);
+    }
 
     protected override async void OnAppearing()
     {
