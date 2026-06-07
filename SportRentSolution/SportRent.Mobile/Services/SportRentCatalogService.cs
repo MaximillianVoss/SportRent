@@ -4,6 +4,9 @@ using SportRent.Mobile.Models;
 
 namespace SportRent.Mobile.Services;
 
+/// <summary>
+/// Читает каталог спортивного инвентаря, тарифы и доступность по пунктам проката.
+/// </summary>
 public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatalogService
 {
     public SportRentCatalogService(ILocalDatabaseService localDatabaseService)
@@ -11,10 +14,12 @@ public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatal
     {
     }
 
+    /// <inheritdoc />
     public async Task<CatalogSnapshot> GetCatalogAsync(CancellationToken cancellationToken = default)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: true, cancellationToken);
 
+        // Каталог разделен на три независимых набора, чтобы экран мог сразу отрисовать фильтры и метрики.
         IReadOnlyList<CatalogCategory> categories = await LoadCategoriesAsync(connection, cancellationToken);
         IReadOnlyList<CatalogEquipmentItem> equipment = await LoadEquipmentAsync(connection, cancellationToken);
         CatalogStats stats = await LoadStatsAsync(connection, cancellationToken);
@@ -27,10 +32,12 @@ public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatal
         };
     }
 
+    /// <inheritdoc />
     public async Task<EquipmentDetails?> GetEquipmentDetailsAsync(int equipmentId, CancellationToken cancellationToken = default)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: true, cancellationToken);
 
+        // Основной запрос возвращает карточку, а тарифы и точки проката загружаются отдельными списками.
         const string detailsSql = """
             SELECT
                 e.id,
@@ -97,6 +104,7 @@ public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatal
 
         string categoryTitle = reader.GetString(reader.GetOrdinal("categoryTitle"));
         string typeTitle = reader.GetString(reader.GetOrdinal("typeTitle"));
+        // Цвета и символы рассчитываются в коде, а не хранятся в БД, чтобы seed-данные оставались предметными.
         (string accentColor, string accentSurfaceColor, string symbolText) = EquipmentVisualIdentity.Resolve(categoryTitle, typeTitle);
 
         IReadOnlyList<EquipmentRate> rates = await LoadRatesAsync(connection, equipmentId, cancellationToken);
@@ -126,6 +134,9 @@ public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatal
         };
     }
 
+    /// <summary>
+    /// Загружает категории каталога для фильтров на главном экране.
+    /// </summary>
     private static async Task<IReadOnlyList<CatalogCategory>> LoadCategoriesAsync(SqliteConnection connection, CancellationToken cancellationToken)
     {
         const string sql = """
@@ -156,6 +167,9 @@ public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatal
         return categories;
     }
 
+    /// <summary>
+    /// Загружает карточки каталога вместе с минимальной ценой и доступным количеством.
+    /// </summary>
     private static async Task<IReadOnlyList<CatalogEquipmentItem>> LoadEquipmentAsync(SqliteConnection connection, CancellationToken cancellationToken)
     {
         const string sql = """
@@ -249,6 +263,9 @@ public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatal
         return items;
     }
 
+    /// <summary>
+    /// Загружает сводные показатели для верхнего блока каталога.
+    /// </summary>
     private static async Task<CatalogStats> LoadStatsAsync(SqliteConnection connection, CancellationToken cancellationToken)
     {
         const string sql = """
@@ -272,6 +289,9 @@ public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatal
         };
     }
 
+    /// <summary>
+    /// Загружает тарифы аренды выбранного инвентаря.
+    /// </summary>
     private static async Task<IReadOnlyList<EquipmentRate>> LoadRatesAsync(SqliteConnection connection, int equipmentId, CancellationToken cancellationToken)
     {
         const string sql = """
@@ -309,6 +329,9 @@ public sealed class SportRentCatalogService : SqliteServiceBase, ISportRentCatal
         return rates;
     }
 
+    /// <summary>
+    /// Загружает остатки выбранного инвентаря по каждому пункту проката.
+    /// </summary>
     private static async Task<IReadOnlyList<RentalPointAvailability>> LoadRentalPointsAsync(SqliteConnection connection, int equipmentId, CancellationToken cancellationToken)
     {
         const string sql = """

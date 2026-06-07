@@ -6,6 +6,9 @@ using SportRent.Mobile.Services;
 
 namespace SportRent.Mobile.ViewModels;
 
+/// <summary>
+/// ViewModel главного экрана каталога с поиском, фильтрами и переходом к карточке инвентаря.
+/// </summary>
 public sealed class MainPageViewModel : ViewModelBase
 {
     private readonly ISportRentCatalogService _catalogService;
@@ -101,6 +104,9 @@ public sealed class MainPageViewModel : ViewModelBase
         private set => SetProperty(ref _totalCategoriesMetric, value);
     }
 
+    /// <summary>
+    /// Загружает каталог из локальной базы и подготавливает фильтры категорий.
+    /// </summary>
     public async Task InitializeAsync(bool forceRefresh = false, CancellationToken cancellationToken = default)
     {
         if (IsBusy && !forceRefresh)
@@ -115,6 +121,7 @@ public sealed class MainPageViewModel : ViewModelBase
 
             CatalogSnapshot snapshot = await _catalogService.GetCatalogAsync(cancellationToken);
 
+            // Храним полный список отдельно, чтобы поиск и категории фильтровали данные без повторного запроса к БД.
             _allEquipment.Clear();
             _allEquipment.AddRange(snapshot.Equipment);
 
@@ -156,6 +163,9 @@ public sealed class MainPageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Открывает экран детальной карточки выбранного инвентаря.
+    /// </summary>
     public async Task OpenEquipmentAsync(CatalogEquipmentItem item)
     {
         if (item is null)
@@ -169,6 +179,9 @@ public sealed class MainPageViewModel : ViewModelBase
         });
     }
 
+    /// <summary>
+    /// Выбирает категорию каталога и пересчитывает видимый список инвентаря.
+    /// </summary>
     public void SelectCategory(CategoryChipViewModel? chip)
     {
         if (chip is null)
@@ -184,6 +197,9 @@ public sealed class MainPageViewModel : ViewModelBase
         ApplyFilters();
     }
 
+    /// <summary>
+    /// Применяет выбранную категорию и текстовый поиск к локальному списку каталога.
+    /// </summary>
     private void ApplyFilters()
     {
         IEnumerable<CatalogEquipmentItem> query = _allEquipment;
@@ -194,6 +210,7 @@ public sealed class MainPageViewModel : ViewModelBase
             query = query.Where(item => item.CategoryId == selectedCategoryId.Value);
         }
 
+        // Поиск охватывает поля, которые пользователь реально видит в карточке каталога.
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
             string search = SearchText.Trim();

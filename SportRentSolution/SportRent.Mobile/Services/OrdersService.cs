@@ -3,6 +3,9 @@ using SportRent.Mobile.Models;
 
 namespace SportRent.Mobile.Services;
 
+/// <summary>
+/// Управляет заказами аренды: созданием, оплатой, отменой и чтением истории.
+/// </summary>
 public sealed class OrdersService : SqliteServiceBase, IOrdersService
 {
     public OrdersService(ILocalDatabaseService localDatabaseService)
@@ -10,10 +13,12 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
     {
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<UserOrder>> GetOrdersAsync(int userId, CancellationToken cancellationToken = default)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: true, cancellationToken);
 
+        // История собирается одним агрегирующим запросом, чтобы экран заказов получил все подписи и суммы сразу.
         const string sql = """
             SELECT
                 ro.id,
@@ -86,6 +91,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
         return orders;
     }
 
+    /// <inheritdoc />
     public async Task<int> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -93,6 +99,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: false, cancellationToken);
         await using SqliteTransaction transaction = (SqliteTransaction)await connection.BeginTransactionAsync(cancellationToken);
 
+        // Перед созданием заказа фиксируем пункт выдачи и доступный остаток выбранной складской позиции.
         SqliteCommand stockCommand = connection.CreateCommand();
         stockCommand.Transaction = transaction;
         stockCommand.CommandText = """
@@ -124,10 +131,12 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
             throw new InvalidOperationException("Недостаточно свободного инвентаря для оформления заказа.");
         }
 
+        // Справочные идентификаторы берутся по названиям, чтобы код не зависел от конкретных числовых id seed-данных.
         int orderStatusId = await GetLookupIdAsync(connection, transaction, "orderStatuses", "Создан", cancellationToken);
         int paymentMethodId = await GetLookupIdAsync(connection, transaction, "paymentMethods", "Онлайн", cancellationToken);
         int paymentStatusId = await GetLookupIdAsync(connection, transaction, "paymentStatuses", "Ожидает оплаты", cancellationToken);
 
+        // checked защищает расчет суммы от переполнения при некорректных входных данных.
         int rentalAmount = checked(request.PricePerUnit * request.PeriodCount * request.Quantity);
         int depositAmount = checked(request.DepositPerUnit * request.Quantity);
         DateTime endAt = request.StartAt.AddHours(request.UnitHours * request.PeriodCount);
@@ -135,6 +144,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
             ? $"Заказ на {request.EquipmentTitle}"
             : request.Description.Trim();
 
+        // Резервируем инвентарь до вставки заказа. Условие availableQuantity >= quantity закрывает гонку между экранами.
         SqliteCommand updateStockCommand = connection.CreateCommand();
         updateStockCommand.Transaction = transaction;
         updateStockCommand.CommandText = """
@@ -152,6 +162,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
             throw new InvalidOperationException("Свободный остаток изменился. Обновите карточку и попробуйте снова.");
         }
 
+        // Сам заказ хранит период аренды, итоговую стоимость и связанные пункты выдачи/возврата.
         SqliteCommand orderCommand = connection.CreateCommand();
         orderCommand.Transaction = transaction;
         orderCommand.CommandText = """
@@ -194,6 +205,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
             ?? throw new InvalidOperationException("Не удалось создать заказ."));
         int orderId = checked((int)orderIdRaw);
 
+        // Строка orderItems связывает заказ с конкретным остатком в пункте проката.
         SqliteCommand orderItemCommand = connection.CreateCommand();
         orderItemCommand.Transaction = transaction;
         orderItemCommand.CommandText = """
@@ -219,6 +231,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
         orderItemCommand.Parameters.AddWithValue("$amount", rentalAmount);
         await orderItemCommand.ExecuteNonQueryAsync(cancellationToken);
 
+        // Мок-платеж создается сразу, чтобы пользователь видел заказ в истории и мог нажать "Оплатить".
         SqliteCommand paymentCommand = connection.CreateCommand();
         paymentCommand.Transaction = transaction;
         paymentCommand.CommandText = """
@@ -245,17 +258,20 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
         return orderId;
     }
 
+    /// <inheritdoc />
     public async Task PayOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: false, cancellationToken);
         await using SqliteTransaction transaction = (SqliteTransaction)await connection.BeginTransactionAsync(cancellationToken);
 
+        // Все изменения оплаты выполняются в одной транзакции, чтобы платеж и статус заказа не расходились.
         int pendingPaymentStatusId = await GetLookupIdAsync(connection, transaction, "paymentStatuses", "Ожидает оплаты", cancellationToken);
         int paidPaymentStatusId = await GetLookupIdAsync(connection, transaction, "paymentStatuses", "Оплачено", cancellationToken);
         int onlinePaymentMethodId = await GetLookupIdAsync(connection, transaction, "paymentMethods", "Онлайн", cancellationToken);
         int createdOrderStatusId = await GetLookupIdAsync(connection, transaction, "orderStatuses", "Создан", cancellationToken);
         int confirmedOrderStatusId = await GetLookupIdAsync(connection, transaction, "orderStatuses", "Подтвержден", cancellationToken);
 
+        // Проверяем принадлежность заказа пользователю до изменения платежа.
         SqliteCommand orderCommand = connection.CreateCommand();
         orderCommand.Transaction = transaction;
         orderCommand.CommandText = """
@@ -314,6 +330,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
             throw new InvalidOperationException("Заказ уже оплачен.");
         }
 
+        // Если платеж уже создан при оформлении заказа, меняем только его статус и способ оплаты.
         if (paymentId.HasValue)
         {
             if (paymentStatusId != pendingPaymentStatusId)
@@ -336,6 +353,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
         }
         else
         {
+            // Запасной путь оставлен для заказов без платежа, если такие появятся после миграций или ручного ввода.
             SqliteCommand createPaymentCommand = connection.CreateCommand();
             createPaymentCommand.Transaction = transaction;
             createPaymentCommand.CommandText = """
@@ -359,6 +377,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
             await createPaymentCommand.ExecuteNonQueryAsync(cancellationToken);
         }
 
+        // После оплаты созданный заказ становится подтвержденным.
         if (orderStatusId == createdOrderStatusId)
         {
             SqliteCommand updateOrderCommand = connection.CreateCommand();
@@ -376,11 +395,13 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
         await transaction.CommitAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
     public async Task CancelOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: false, cancellationToken);
         await using SqliteTransaction transaction = (SqliteTransaction)await connection.BeginTransactionAsync(cancellationToken);
 
+        // Отменять можно только созданный заказ, который еще ожидает тестовой оплаты.
         int pendingPaymentStatusId = await GetLookupIdAsync(connection, transaction, "paymentStatuses", "Ожидает оплаты", cancellationToken);
         int createdOrderStatusId = await GetLookupIdAsync(connection, transaction, "orderStatuses", "Создан", cancellationToken);
         int canceledOrderStatusId = await GetLookupIdAsync(connection, transaction, "orderStatuses", "Отменен", cancellationToken);
@@ -426,6 +447,7 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
             throw new InvalidOperationException("Заказ не ожидает оплаты и не может быть отменен.");
         }
 
+        // Возвращаем в каталог ровно то количество, которое было зарезервировано позициями заказа.
         SqliteCommand restoreStockCommand = connection.CreateCommand();
         restoreStockCommand.Transaction = transaction;
         restoreStockCommand.CommandText = """
@@ -466,6 +488,9 @@ public sealed class OrdersService : SqliteServiceBase, IOrdersService
         await transaction.CommitAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Находит идентификатор справочного значения по его названию.
+    /// </summary>
     private static async Task<int> GetLookupIdAsync(
         SqliteConnection connection,
         SqliteTransaction transaction,

@@ -4,6 +4,9 @@ using SportRent.Mobile.ViewModels;
 
 namespace SportRent.Mobile.Pages;
 
+/// <summary>
+/// Code-behind экрана оформления аренды: связывает элементы формы с CreateOrderPageViewModel.
+/// </summary>
 public partial class CreateOrderPage : ContentPage, IQueryAttributable
 {
     private int? _pendingEquipmentId;
@@ -17,13 +20,16 @@ public partial class CreateOrderPage : ContentPage, IQueryAttributable
     private CreateOrderPageViewModel ViewModel => (CreateOrderPageViewModel)BindingContext;
 
     /// <summary>
-    /// Returns from order creation to the catalog tab.
+    /// Возвращает пользователя с оформления аренды к каталогу.
     /// </summary>
     private async void OnBackToCatalogClicked(object? sender, EventArgs e)
     {
         await Shell.Current.GoToAsync(AppRoutes.Catalog, true);
     }
 
+    /// <summary>
+    /// Принимает equipmentId из Shell-навигации и откладывает загрузку до OnAppearing.
+    /// </summary>
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (!query.TryGetValue("equipmentId", out object? rawValue) || rawValue is null)
@@ -43,16 +49,23 @@ public partial class CreateOrderPage : ContentPage, IQueryAttributable
         }
     }
 
+    /// <summary>
+    /// Загружает инвентарь после получения параметров маршрута.
+    /// </summary>
     protected override async void OnAppearing()
     {
         base.OnAppearing();
 
         if (_pendingEquipmentId.HasValue)
         {
+            // Загрузка выполняется здесь, потому что query-параметры приходят до полного появления страницы.
             await ViewModel.LoadAsync(_pendingEquipmentId.Value);
         }
     }
 
+    /// <summary>
+    /// Обрабатывает выбор тарифа аренды.
+    /// </summary>
     private void OnRateTapped(object? sender, TappedEventArgs e)
     {
         if ((sender as BindableObject)?.BindingContext is RentalRateOptionViewModel option)
@@ -61,6 +74,9 @@ public partial class CreateOrderPage : ContentPage, IQueryAttributable
         }
     }
 
+    /// <summary>
+    /// Обрабатывает выбор пункта проката.
+    /// </summary>
     private void OnRentalPointTapped(object? sender, TappedEventArgs e)
     {
         if ((sender as BindableObject)?.BindingContext is RentalPointOptionViewModel option)
@@ -69,26 +85,41 @@ public partial class CreateOrderPage : ContentPage, IQueryAttributable
         }
     }
 
+    /// <summary>
+    /// Увеличивает количество единиц инвентаря в форме заказа.
+    /// </summary>
     private void OnIncreaseQuantityClicked(object? sender, EventArgs e)
     {
         ViewModel.IncreaseQuantity();
     }
 
+    /// <summary>
+    /// Уменьшает количество единиц инвентаря в форме заказа.
+    /// </summary>
     private void OnDecreaseQuantityClicked(object? sender, EventArgs e)
     {
         ViewModel.DecreaseQuantity();
     }
 
+    /// <summary>
+    /// Увеличивает количество периодов аренды.
+    /// </summary>
     private void OnIncreasePeriodClicked(object? sender, EventArgs e)
     {
         ViewModel.IncreasePeriodCount();
     }
 
+    /// <summary>
+    /// Уменьшает количество периодов аренды.
+    /// </summary>
     private void OnDecreasePeriodClicked(object? sender, EventArgs e)
     {
         ViewModel.DecreasePeriodCount();
     }
 
+    /// <summary>
+    /// Оформляет заказ и переводит пользователя в историю заказов.
+    /// </summary>
     private async void OnSubmitClicked(object? sender, EventArgs e)
     {
         int? orderId = await ViewModel.SubmitAsync();

@@ -1,17 +1,17 @@
 namespace SportRent.Mobile.Infrastructure;
 
 /// <summary>
-/// Central Shell route names used by screen navigation handlers.
+/// Централизованные маршруты Shell, используемые обработчиками навигации.
 /// </summary>
 public static class AppRoutes
 {
     /// <summary>
-    /// Absolute route to the catalog tab, used by explicit return-to-catalog buttons.
+    /// Абсолютный маршрут вкладки каталога для явных кнопок возврата.
     /// </summary>
     public const string Catalog = "//catalog";
 
     /// <summary>
-    /// Absolute route to the order history tab after successful order creation.
+    /// Абсолютный маршрут вкладки заказов после успешного оформления аренды.
     /// </summary>
     public const string Orders = "//orders";
 }

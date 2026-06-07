@@ -3,6 +3,9 @@ using SportRent.Mobile.Models;
 
 namespace SportRent.Mobile.Services;
 
+/// <summary>
+/// Выполняет авторизацию и сбор данных профиля из локальной SQLite-базы.
+/// </summary>
 public sealed class AuthenticationService : SqliteServiceBase, IAuthenticationService
 {
     public AuthenticationService(ILocalDatabaseService localDatabaseService)
@@ -10,10 +13,12 @@ public sealed class AuthenticationService : SqliteServiceBase, IAuthenticationSe
     {
     }
 
+    /// <inheritdoc />
     public async Task<IReadOnlyList<DemoAccount>> GetDemoAccountsAsync(CancellationToken cancellationToken = default)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: true, cancellationToken);
 
+        // Демо-аккаунты берутся из общей таблицы пользователей, чтобы проверяющий мог войти без регистрации.
         const string sql = """
             SELECT
                 u.id,
@@ -48,10 +53,12 @@ public sealed class AuthenticationService : SqliteServiceBase, IAuthenticationSe
         return accounts;
     }
 
+    /// <inheritdoc />
     public async Task<UserSession?> SignInAsync(string email, string password, CancellationToken cancellationToken = default)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: true, cancellationToken);
 
+        // Для учебного проекта пароль сравнивается напрямую с seed-значением passwordHash.
         const string sql = """
             SELECT
                 u.id,
@@ -89,10 +96,12 @@ public sealed class AuthenticationService : SqliteServiceBase, IAuthenticationSe
         };
     }
 
+    /// <inheritdoc />
     public async Task<UserProfile?> GetProfileAsync(int userId, CancellationToken cancellationToken = default)
     {
         await using SqliteConnection connection = await OpenConnectionAsync(readOnly: true, cancellationToken);
 
+        // Профиль собирается одним запросом, чтобы экран не выполнял отдельные запросы для каждой метрики.
         const string sql = """
             SELECT
                 u.id,
@@ -137,6 +146,7 @@ public sealed class AuthenticationService : SqliteServiceBase, IAuthenticationSe
                     INNER JOIN orderStatuses os ON os.id = ro.idStatus
                     WHERE ro.idUser = u.id
                       AND ps.title = 'Ожидает оплаты'
+                      -- Отмененные заказы не должны отображаться как задолженность пользователя.
                       AND os.title <> 'Отменен'
                 ), 0) AS outstandingAmount
             FROM users u

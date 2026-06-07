@@ -4,6 +4,9 @@ using SportRent.Mobile.ViewModels;
 
 namespace SportRent.Mobile.Pages;
 
+/// <summary>
+/// Code-behind карточки инвентаря: получает route-параметры и запускает оформление аренды.
+/// </summary>
 public partial class EquipmentDetailsPage : ContentPage, IQueryAttributable
 {
     private int? _pendingEquipmentId;
@@ -17,13 +20,16 @@ public partial class EquipmentDetailsPage : ContentPage, IQueryAttributable
     private EquipmentDetailsPageViewModel ViewModel => (EquipmentDetailsPageViewModel)BindingContext;
 
     /// <summary>
-    /// Returns from the equipment card to the catalog tab.
+    /// Возвращает пользователя из карточки инвентаря к каталогу.
     /// </summary>
     private async void OnBackToCatalogClicked(object? sender, EventArgs e)
     {
         await Shell.Current.GoToAsync(AppRoutes.Catalog, true);
     }
 
+    /// <summary>
+    /// Принимает equipmentId из Shell-навигации для последующей загрузки карточки.
+    /// </summary>
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (!query.TryGetValue("equipmentId", out object? rawValue) || rawValue is null)
@@ -43,16 +49,23 @@ public partial class EquipmentDetailsPage : ContentPage, IQueryAttributable
         }
     }
 
+    /// <summary>
+    /// Загружает карточку инвентаря после появления страницы.
+    /// </summary>
     protected override async void OnAppearing()
     {
         base.OnAppearing();
 
         if (_pendingEquipmentId.HasValue)
         {
+            // Загрузка выполняется после появления страницы, когда BindingContext уже готов к обновлению.
             await ViewModel.LoadAsync(_pendingEquipmentId.Value);
         }
     }
 
+    /// <summary>
+    /// Открывает форму оформления аренды для текущего инвентаря.
+    /// </summary>
     private async void OnCreateOrderClicked(object? sender, EventArgs e)
     {
         if (ViewModel.EquipmentId <= 0)

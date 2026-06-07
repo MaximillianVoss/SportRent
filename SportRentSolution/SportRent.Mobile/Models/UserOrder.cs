@@ -49,20 +49,20 @@ public sealed class UserOrder
             : $"{PaymentMethodTitle} · {PaymentStatusTitle}";
 
     /// <summary>
-    /// Indicates that the order is closed by user cancellation.
+    /// Показывает, что заказ закрыт отменой пользователя.
     /// </summary>
     public bool IsCanceled =>
         string.Equals(StatusTitle, "Отменен", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Indicates that the order still has a mock payment waiting for completion.
+    /// Показывает, что заказ ожидает выполнения тестового платежа.
     /// </summary>
     public bool IsPaymentPending =>
         !IsCanceled &&
         string.Equals(PaymentStatusTitle, "Ожидает оплаты", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Allows the UI to show cancellation only for created unpaid orders.
+    /// Разрешает показывать кнопку отмены только для созданных неоплаченных заказов.
     /// </summary>
     public bool CanCancel =>
         IsPaymentPending &&

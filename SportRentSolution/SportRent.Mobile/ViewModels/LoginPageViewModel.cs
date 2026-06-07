@@ -4,6 +4,9 @@ using SportRent.Mobile.Services;
 
 namespace SportRent.Mobile.ViewModels;
 
+/// <summary>
+/// ViewModel экрана входа с демо-аккаунтами для проверки приложения.
+/// </summary>
 public sealed class LoginPageViewModel : ViewModelBase
 {
     private readonly IAuthenticationService _authenticationService;
@@ -56,6 +59,9 @@ public sealed class LoginPageViewModel : ViewModelBase
 
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
+    /// <summary>
+    /// Загружает демо-аккаунты и подставляет первый аккаунт в форму входа.
+    /// </summary>
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         if (_hasInitialized)
@@ -78,6 +84,7 @@ public sealed class LoginPageViewModel : ViewModelBase
 
             if (DemoAccounts.Count > 0)
             {
+                // Первый аккаунт выбирается автоматически, чтобы проверяющий мог сразу нажать "Войти".
                 ApplyDemoAccount(DemoAccounts[0]);
             }
 
@@ -93,12 +100,18 @@ public sealed class LoginPageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Подставляет выбранный демо-аккаунт в поля почты и пароля.
+    /// </summary>
     public void ApplyDemoAccount(DemoAccount account)
     {
         Email = account.Email;
         Password = account.Password;
     }
 
+    /// <summary>
+    /// Выполняет вход и сохраняет пользовательскую сессию при успешной проверке.
+    /// </summary>
     public async Task<bool> SignInAsync(CancellationToken cancellationToken = default)
     {
         if (IsBusy)
@@ -118,6 +131,7 @@ public sealed class LoginPageViewModel : ViewModelBase
                 return false;
             }
 
+            // Смена сессии автоматически переключит корневую страницу приложения через App.
             _userSessionService.SetCurrentUser(session);
             return true;
         }

@@ -2,6 +2,9 @@ using Microsoft.Maui.Storage;
 
 namespace SportRent.Mobile.Services;
 
+/// <summary>
+/// Готовит рабочую копию SQLite-базы из ресурсов приложения.
+/// </summary>
 public sealed class LocalDatabaseService : ILocalDatabaseService
 {
     private const string PackagedDatabasePath = "Database/sportRent.db";
@@ -11,6 +14,7 @@ public sealed class LocalDatabaseService : ILocalDatabaseService
     private readonly SemaphoreSlim _syncLock = new(1, 1);
     private string? _workingCopyPath;
 
+    /// <inheritdoc />
     public async Task<string> GetWorkingCopyPathAsync(CancellationToken cancellationToken = default)
     {
         if (!string.IsNullOrWhiteSpace(_workingCopyPath) && File.Exists(_workingCopyPath))
@@ -22,6 +26,8 @@ public sealed class LocalDatabaseService : ILocalDatabaseService
 
         try
         {
+            // Повторная проверка нужна после входа в синхронизированную секцию:
+            // другая операция могла уже подготовить файл базы.
             if (!string.IsNullOrWhiteSpace(_workingCopyPath) && File.Exists(_workingCopyPath))
             {
                 return _workingCopyPath;
@@ -35,6 +41,7 @@ public sealed class LocalDatabaseService : ILocalDatabaseService
 
             if (!File.Exists(workingCopyPath) || !string.Equals(installedVersion, CurrentDatabaseVersion, StringComparison.Ordinal))
             {
+                // База из пакета копируется в AppData, потому что SQLite-файл из ресурсов нельзя изменять напрямую.
                 await using Stream packagedDatabase = await FileSystem.OpenAppPackageFileAsync(PackagedDatabasePath);
                 await using FileStream output = File.Create(workingCopyPath);
                 await packagedDatabase.CopyToAsync(output, cancellationToken);

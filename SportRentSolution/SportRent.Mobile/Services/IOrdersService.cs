@@ -5,22 +5,22 @@ namespace SportRent.Mobile.Services;
 public interface IOrdersService
 {
     /// <summary>
-    /// Gets the rental order history for a concrete user.
+    /// Возвращает историю заказов аренды для конкретного пользователя.
     /// </summary>
     Task<IReadOnlyList<UserOrder>> GetOrdersAsync(int userId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Creates a pending rental order and reserves the selected stock quantity.
+    /// Создает заказ со статусом ожидания оплаты и резервирует выбранный остаток инвентаря.
     /// </summary>
     Task<int> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Marks a pending order payment as paid and confirms the created order.
+    /// Отмечает тестовый платеж как оплаченный и подтверждает созданный заказ.
     /// </summary>
     Task PayOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Cancels a created unpaid order and restores the reserved catalog stock.
+    /// Отменяет созданный неоплаченный заказ и возвращает зарезервированный остаток в каталог.
     /// </summary>
     Task CancelOrderAsync(int userId, int orderId, CancellationToken cancellationToken = default);
 }

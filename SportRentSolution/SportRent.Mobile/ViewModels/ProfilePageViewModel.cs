@@ -2,6 +2,9 @@ using SportRent.Mobile.Services;
 
 namespace SportRent.Mobile.ViewModels;
 
+/// <summary>
+/// ViewModel профиля пользователя со статистикой заказов и платежей.
+/// </summary>
 public sealed class ProfilePageViewModel : ViewModelBase
 {
     private readonly IAuthenticationService _authenticationService;
@@ -106,6 +109,9 @@ public sealed class ProfilePageViewModel : ViewModelBase
 
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
+    /// <summary>
+    /// Загружает профиль текущего пользователя и отображаемые метрики.
+    /// </summary>
     public async Task InitializeAsync(bool forceRefresh = false, CancellationToken cancellationToken = default)
     {
         if (IsBusy && !forceRefresh)
@@ -131,6 +137,7 @@ public sealed class ProfilePageViewModel : ViewModelBase
                 return;
             }
 
+            // Модель профиля уже содержит отформатированные строки для денежных показателей.
             DisplayName = profile.DisplayName;
             RoleTitle = profile.RoleTitle;
             Email = profile.Email;
@@ -152,6 +159,9 @@ public sealed class ProfilePageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Завершает сессию пользователя и возвращает приложение к экрану входа.
+    /// </summary>
     public void SignOut()
     {
         _userSessionService.SignOut();

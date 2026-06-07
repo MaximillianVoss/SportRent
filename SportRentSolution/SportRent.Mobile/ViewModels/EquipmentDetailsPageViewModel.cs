@@ -4,6 +4,9 @@ using SportRent.Mobile.Services;
 
 namespace SportRent.Mobile.ViewModels;
 
+/// <summary>
+/// ViewModel карточки инвентаря с тарифами и остатками по пунктам проката.
+/// </summary>
 public sealed class EquipmentDetailsPageViewModel : ViewModelBase
 {
     private readonly ISportRentCatalogService _catalogService;
@@ -153,6 +156,9 @@ public sealed class EquipmentDetailsPageViewModel : ViewModelBase
 
     public bool HasRentalPoints => RentalPoints.Count > 0;
 
+    /// <summary>
+    /// Загружает детальные данные выбранного инвентаря и обновляет экран карточки.
+    /// </summary>
     public async Task LoadAsync(int equipmentId, bool forceReload = false, CancellationToken cancellationToken = default)
     {
         if (IsBusy || (!forceReload && _loadedEquipmentId == equipmentId))
@@ -172,6 +178,7 @@ public sealed class EquipmentDetailsPageViewModel : ViewModelBase
                 return;
             }
 
+            // После успешной загрузки сохраняем id, чтобы не перезагружать ту же карточку при повторном OnAppearing.
             _loadedEquipmentId = equipmentId;
             EquipmentId = equipment.Id;
 
@@ -209,6 +216,9 @@ public sealed class EquipmentDetailsPageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Полностью заменяет содержимое ObservableCollection, сохраняя сам объект коллекции для XAML-привязки.
+    /// </summary>
     private static void ReplaceCollection<T>(ObservableCollection<T> collection, IEnumerable<T> items)
     {
         collection.Clear();

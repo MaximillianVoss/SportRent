@@ -5,6 +5,9 @@ using SportRent.Mobile.Services;
 
 namespace SportRent.Mobile.ViewModels;
 
+/// <summary>
+/// ViewModel экрана оформления аренды с выбором тарифа, пункта проката и периода.
+/// </summary>
 public sealed class CreateOrderPageViewModel : ViewModelBase
 {
     private readonly ISportRentCatalogService _catalogService;
@@ -217,6 +220,9 @@ public sealed class CreateOrderPageViewModel : ViewModelBase
         private set => SetProperty(ref _successMessage, value);
     }
 
+    /// <summary>
+    /// Загружает данные инвентаря, доступные тарифы и пункты проката для оформления заказа.
+    /// </summary>
     public async Task LoadAsync(int equipmentId, CancellationToken cancellationToken = default)
     {
         if (IsBusy || _loadedEquipmentId == equipmentId)
@@ -248,6 +254,7 @@ public sealed class CreateOrderPageViewModel : ViewModelBase
             AccentSurfaceColor = equipment.AccentSurfaceColor;
             SymbolText = equipment.SymbolText;
 
+            // Тарифы и пункты проката пересоздаются для выбранной карточки инвентаря.
             Rates.Clear();
             foreach (EquipmentRate rate in equipment.Rates)
             {
@@ -292,6 +299,9 @@ public sealed class CreateOrderPageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Выбирает тариф аренды и пересчитывает итоговую стоимость заказа.
+    /// </summary>
     public void SelectRate(RentalRateOptionViewModel option)
     {
         foreach (RentalRateOptionViewModel rate in Rates)
@@ -302,6 +312,9 @@ public sealed class CreateOrderPageViewModel : ViewModelBase
         RecalculateSummary();
     }
 
+    /// <summary>
+    /// Выбирает пункт проката и ограничивает количество доступным остатком.
+    /// </summary>
     public void SelectRentalPoint(RentalPointOptionViewModel option)
     {
         foreach (RentalPointOptionViewModel rentalPoint in RentalPoints)
@@ -349,6 +362,9 @@ public sealed class CreateOrderPageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Проверяет форму и создает заказ через сервис заказов.
+    /// </summary>
     public async Task<int?> SubmitAsync(CancellationToken cancellationToken = default)
     {
         if (IsBusy)
@@ -385,6 +401,7 @@ public sealed class CreateOrderPageViewModel : ViewModelBase
             ErrorMessage = null;
             SuccessMessage = string.Empty;
 
+            // Сервис создает заказ, резервирует остаток и добавляет мок-платеж в одной транзакции.
             int orderId = await _ordersService.CreateOrderAsync(new CreateOrderRequest
             {
                 UserId = currentUser.UserId,
@@ -414,6 +431,9 @@ public sealed class CreateOrderPageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Пересчитывает дату окончания, стоимость аренды, залог и итоговый платеж.
+    /// </summary>
     private void RecalculateSummary()
     {
         RentalRateOptionViewModel? selectedRate = Rates.FirstOrDefault(rate => rate.IsSelected);
@@ -437,6 +457,9 @@ public sealed class CreateOrderPageViewModel : ViewModelBase
         TotalPaymentText = DisplayFormatter.ToCurrency(rentalAmount + depositAmount);
     }
 
+    /// <summary>
+    /// Возвращает максимально доступное количество для выбранного пункта проката.
+    /// </summary>
     private int GetMaxQuantity()
     {
         RentalPointOptionViewModel? selectedPoint = RentalPoints.FirstOrDefault(point => point.IsSelected);

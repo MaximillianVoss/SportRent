@@ -4,6 +4,9 @@ using SportRent.Mobile.Services;
 
 namespace SportRent.Mobile.ViewModels;
 
+/// <summary>
+/// ViewModel экрана истории заказов с оплатой и отменой неоплаченных заказов.
+/// </summary>
 public sealed class OrdersPageViewModel : ViewModelBase
 {
     private readonly IOrdersService _ordersService;
@@ -48,6 +51,9 @@ public sealed class OrdersPageViewModel : ViewModelBase
 
     public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
+    /// <summary>
+    /// Отменяет созданный неоплаченный заказ и обновляет историю заказов.
+    /// </summary>
     public async Task<bool> CancelOrderAsync(UserOrder order, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(order);
@@ -75,6 +81,7 @@ public sealed class OrdersPageViewModel : ViewModelBase
             IsBusy = true;
             ErrorMessage = null;
 
+            // Сервис возвращает остаток в каталог, а ViewModel только обновляет отображаемый список.
             await _ordersService.CancelOrderAsync(currentUser.UserId, order.Id, cancellationToken);
             await InitializeAsync(forceRefresh: true, cancellationToken);
             return true;
@@ -90,6 +97,9 @@ public sealed class OrdersPageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Выполняет тестовую оплату заказа и обновляет историю заказов.
+    /// </summary>
     public async Task<bool> PayOrderAsync(UserOrder order, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(order);
@@ -132,6 +142,9 @@ public sealed class OrdersPageViewModel : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// Загружает историю заказов текущего пользователя.
+    /// </summary>
     public async Task InitializeAsync(bool forceRefresh = false, CancellationToken cancellationToken = default)
     {
         if (IsBusy && !forceRefresh)
@@ -155,6 +168,7 @@ public sealed class OrdersPageViewModel : ViewModelBase
 
             IReadOnlyList<UserOrder> orders = await _ordersService.GetOrdersAsync(currentUser.UserId, cancellationToken);
 
+            // ObservableCollection обновляется вручную, чтобы XAML сразу получил изменения списка.
             Orders.Clear();
             foreach (UserOrder order in orders)
             {

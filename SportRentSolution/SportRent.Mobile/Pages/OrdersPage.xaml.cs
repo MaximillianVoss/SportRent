@@ -5,6 +5,9 @@ using SportRent.Mobile.ViewModels;
 
 namespace SportRent.Mobile.Pages;
 
+/// <summary>
+/// Code-behind истории заказов: передает команды оплаты и отмены в OrdersPageViewModel.
+/// </summary>
 public partial class OrdersPage : ContentPage
 {
     private bool _hasInitialized;
@@ -18,13 +21,16 @@ public partial class OrdersPage : ContentPage
     private OrdersPageViewModel ViewModel => (OrdersPageViewModel)BindingContext;
 
     /// <summary>
-    /// Returns from order history to the catalog tab.
+    /// Возвращает пользователя из истории заказов к каталогу.
     /// </summary>
     private async void OnBackToCatalogClicked(object? sender, EventArgs e)
     {
         await Shell.Current.GoToAsync(AppRoutes.Catalog, true);
     }
 
+    /// <summary>
+    /// Загружает или обновляет историю заказов при открытии экрана.
+    /// </summary>
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -39,11 +45,17 @@ public partial class OrdersPage : ContentPage
         await ViewModel.InitializeAsync();
     }
 
+    /// <summary>
+    /// Обновляет список заказов по жесту Pull-to-refresh.
+    /// </summary>
     private async void OnRefreshRequested(object? sender, EventArgs e)
     {
         await ViewModel.InitializeAsync(forceRefresh: true);
     }
 
+    /// <summary>
+    /// Запускает тестовую оплату выбранного заказа.
+    /// </summary>
     private async void OnPayOrderClicked(object? sender, EventArgs e)
     {
         if ((sender as BindableObject)?.BindingContext is not UserOrder order)
@@ -58,6 +70,9 @@ public partial class OrdersPage : ContentPage
         }
     }
 
+    /// <summary>
+    /// Запрашивает подтверждение и отменяет неоплаченный заказ.
+    /// </summary>
     private async void OnCancelOrderClicked(object? sender, EventArgs e)
     {
         if ((sender as BindableObject)?.BindingContext is not UserOrder order)
@@ -76,6 +91,7 @@ public partial class OrdersPage : ContentPage
             return;
         }
 
+        // ViewModel проверит статус заказа и вызовет сервис, который вернет остаток в каталог.
         bool isCanceled = await ViewModel.CancelOrderAsync(order);
         if (isCanceled)
         {
